@@ -57,9 +57,9 @@ public:
     return *this;
   };
   void print(); // Recursively prints the tree
-  void print(map<pair<Vertex, Vertex>, vector<Vertex>>
-                 hash); // Recursively prints the tree
-  void pruneRoot();     // prune the root if it's not a terminal node
-  Weight pruneLeaves(); // prune useless leaves en return the size of the tree
+  void print(const map<pair<Vertex, Vertex>, vector<Vertex>>
+                 &hash); // Recursively prints the tree
+  void pruneRoot();      // prune the root if it's not a terminal node
+  Weight pruneLeaves();  // prune useless leaves en return the size of the tree
   int size();
 };

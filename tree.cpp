@@ -53,7 +53,7 @@ int treeNode::pruneLeaves(const vector<int> &terminalsMap) {
 
 void Tree::print() { root->printSubTree(); }
 
-void Tree::print(map<pair<Vertex, Vertex>, vector<Vertex>> hash) {
+void Tree::print(const map<pair<Vertex, Vertex>, vector<Vertex>> &hash) {
   stack<shared_ptr<treeNode>> next;
   next.push(root);
   while (!next.empty()) {
@@ -63,10 +63,10 @@ void Tree::print(map<pair<Vertex, Vertex>, vector<Vertex>> hash) {
              current->children.begin();
          it != current->children.end(); ++it) {
       cout << current->v + 1 << " ";
-      map<pair<Vertex, Vertex>, vector<Vertex>>::iterator it_path =
+      map<pair<Vertex, Vertex>, vector<Vertex>>::const_iterator it_path =
           hash.find({current->v, it->first});
       if (it_path != hash.end()) {
-        for (vector<Vertex>::iterator path = it_path->second.begin();
+        for (vector<Vertex>::const_iterator path = it_path->second.begin();
              path != it_path->second.end(); ++path) {
           cout << *path + 1 << endl << *path + 1 << " ";
         }
@@ -156,15 +156,15 @@ Tree::Tree(const Graph &G, istream &input)
     } else {
       parent = v1;
       child = v2;
-      if (tree[v2] != -1){
-          Vertex tmp1 = v2, tmp2 = tree[v2];
-          tree[v2] = -1;
-          while(tmp2 != -1){
-              Vertex tmp = tree[tmp2];
-              tree[tmp2] = tmp1;
-              tmp1 = tmp2;
-              tmp2 = tmp;
-          }
+      if (tree[v2] != -1) {
+        Vertex tmp1 = v2, tmp2 = tree[v2];
+        tree[v2] = -1;
+        while (tmp2 != -1) {
+          Vertex tmp = tree[tmp2];
+          tree[tmp2] = tmp1;
+          tmp1 = tmp2;
+          tmp2 = tmp;
+        }
       }
     }
     tree[child] = parent;

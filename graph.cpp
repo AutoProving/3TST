@@ -115,7 +115,7 @@ Vertex dijkstra(const vector<map<Vertex, Weight>> &adjList,
     Vertex where = active_vertices.begin()->second;
     if (terminalsMap[where] != -1)
       --T;
-    if (!T)
+    if (T == 0)
       return where;
     active_vertices.erase(active_vertices.begin());
     for (std::map<Vertex, Weight>::const_iterator it = adjList[where].begin();
@@ -223,6 +223,28 @@ void Graph::print() {
   }
 }
 
+void check(const Graph &G) {
+  for (Vertex v = 0; v < G.numberVertices; ++v) {
+    for (auto it = G.adjList[v].begin(); it != G.adjList[v].end(); ++it) {
+      auto tmp = G.adjList[it->first].find(v);
+      if (tmp == G.adjList[it->first].end())
+        cerr << v << " " << it->first << endl;
+      assert(tmp != G.adjList[it->first].end());
+      assert(tmp->second == it->second);
+    }
+  }
+  vector<Weight> min_distance(G.adjList.size(), MAX_WEIGHT);
+  vector<Vertex> origin(G.adjList.size(), -1);
+  dijkstra(G.adjList, min_distance, origin, G.terminals.front());
+  for (Vertex v = 0; v < G.numberVertices; ++v) {
+    assert(min_distance[v] != MAX_WEIGHT || origin[v] == -1);
+    assert(min_distance[v] == MAX_WEIGHT || origin[v] != -1 ||
+           v == G.terminals.front());
+    assert(min_distance[v] != MAX_WEIGHT || G.adjList[v].size() == 0);
+    assert(min_distance[v] != MAX_WEIGHT || G.terminalsMap[v] == -1);
+  }
+}
+
 map<pair<Vertex, Vertex>, vector<Vertex>> Graph::contract() {
   map<pair<Vertex, Vertex>, vector<Vertex>> hash;
   // Contract vertex of degree 1
@@ -249,68 +271,104 @@ map<pair<Vertex, Vertex>, vector<Vertex>> Graph::contract() {
       adjList[v].clear();
 
       vector<Vertex> tmp1;
+      vector<Vertex> tmp2;
       tmp1.push_back(v);
       Vertex old_v1 = v;
+      Vertex old_v2 = v;
+      auto it = hash.find({old_v1, v1});
+      if (it != hash.end()) {
+        tmp1.insert(tmp1.end(), it->second.begin(), it->second.end());
+        hash.erase(it);
+        hash.erase(hash.find({v1, old_v1}));
+      }
+      it = hash.find({old_v2, v2});
+      if (it != hash.end()) {
+        tmp2.insert(tmp2.end(), it->second.begin(), it->second.end());
+        hash.erase(it);
+        hash.erase(hash.find({v2, old_v2}));
+      }
 
-      while (terminalsMap[v1] == -1 && adjList[v1].size() == 2) {
-        tmp1.push_back(v1);
-        if (adjList[v1].begin()->first == old_v1) {
-          old_v1 = v1;
-          w1 += adjList[v1].rbegin()->second;
-          v1 = adjList[v1].rbegin()->first;
+      while ((terminalsMap[v1] == -1 && adjList[v1].size() == 2) ||
+             (terminalsMap[v2] == -1 && adjList[v2].size() == 2)) {
+        while (terminalsMap[v1] == -1 && adjList[v1].size() == 2) {
+          if (adjList[v1].begin()->first == old_v1) {
+            old_v1 = v1;
+            w1 += adjList[v1].rbegin()->second;
+            v1 = adjList[v1].rbegin()->first;
+          } else {
+            old_v1 = v1;
+            w1 += adjList[v1].begin()->second;
+            v1 = adjList[v1].begin()->first;
+          }
           adjList[old_v1].clear();
-        } else {
-          old_v1 = v1;
-          w1 += adjList[v1].begin()->second;
-          v1 = adjList[v1].begin()->first;
-          adjList[old_v1].clear();
+          auto it = hash.find({old_v1, v1});
+          if (it != hash.end()) {
+            tmp1.insert(tmp1.end(), it->second.begin(), it->second.end());
+            hash.erase(it);
+            hash.erase(hash.find({v1, old_v1}));
+          }
+          tmp1.push_back(old_v1);
+        }
+
+        while (terminalsMap[v2] == -1 && adjList[v2].size() == 2) {
+          if (adjList[v2].begin()->first == old_v2) {
+            old_v2 = v2;
+            w2 += adjList[v2].rbegin()->second;
+            v2 = adjList[v2].rbegin()->first;
+          } else {
+            old_v2 = v2;
+            w2 += adjList[v2].begin()->second;
+            v2 = adjList[v2].begin()->first;
+          }
+          adjList[old_v2].clear();
+          auto it = hash.find({old_v2, v2});
+          if (it != hash.end()) {
+            tmp2.insert(tmp2.end(), it->second.begin(), it->second.end());
+            hash.erase(it);
+            hash.erase(hash.find({v2, old_v2}));
+          }
+          tmp2.push_back(old_v2);
+        }
+
+        map<Vertex, Weight>::iterator itn = adjList[v1].find(v2);
+        if (itn != adjList[v1].end()) {
+          if (itn->second > w1 + w2) {
+            adjList[v1].erase(itn);
+            auto it = adjList[v2].find(v1);
+            if (it != adjList[v2].end())
+              adjList[v2].erase(it);
+          }
         }
       }
       adjList[v1].erase(old_v1);
-
-      vector<Vertex> tmp2(tmp1.rbegin(), tmp1.rend());
-      Vertex old_v2 = v;
-
-      while (terminalsMap[v2] == -1 && adjList[v2].size() == 2) {
-        tmp2.push_back(v2);
-        if (adjList[v2].begin()->first == old_v2) {
-          old_v2 = v2;
-          w2 += adjList[v2].rbegin()->second;
-          v2 = adjList[v2].rbegin()->first;
-          adjList[old_v2].clear();
-        } else {
-          old_v2 = v2;
-          w2 += adjList[v2].begin()->second;
-          v2 = adjList[v2].begin()->first;
-          adjList[old_v2].clear();
-        }
-      }
       adjList[v2].erase(old_v2);
 
-      map<Vertex, Weight>::iterator itn = adjList[v1].find(v2);
-      if (itn == adjList[v1].end()) {
-        adjList[v1].insert({v2, w1 + w2});
-        hash.insert({{v1, v2}, tmp2});
-      } else {
-        if (itn->second > w1 + w2) {
-          adjList[v1].erase(itn);
+      if (v1 != v2) {
+        auto tmp = vector<Vertex>(tmp1.rbegin(), tmp1.rend());
+        tmp.insert(tmp.end(), tmp2.begin(), tmp2.end());
+        map<Vertex, Weight>::iterator itn = adjList[v1].find(v2);
+        if (itn == adjList[v1].end()) {
           adjList[v1].insert({v2, w1 + w2});
-          hash.erase({v1, v2});
-          hash.insert({{v1, v2}, tmp2});
+          hash.insert({{v1, v2}, tmp});
+        } else {
+          if (itn->second > w1 + w2) {
+            adjList[v1].erase(itn);
+            adjList[v1].insert({v2, w1 + w2});
+            hash.erase({v1, v2});
+            hash.insert({{v1, v2}, tmp});
+          }
         }
-      }
-      tmp1.clear();
-      tmp1.insert(tmp1.begin(), tmp2.rbegin(), tmp2.rend());
-      itn = adjList[v2].find(v1);
-      if (itn == adjList[v2].end()) {
-        adjList[v2].insert({v1, w1 + w2});
-        hash.insert({{v2, v1}, tmp1});
-      } else {
-        if (itn->second > w1 + w2) {
-          adjList[v2].erase(itn);
+        itn = adjList[v2].find(v1);
+        if (itn == adjList[v2].end()) {
           adjList[v2].insert({v1, w1 + w2});
-          hash.erase({v2, v1});
-          hash.insert({{v2, v1}, tmp1});
+          hash.insert({{v2, v1}, vector<Vertex>(tmp.rbegin(), tmp.rend())});
+        } else {
+          if (itn->second > w1 + w2) {
+            adjList[v2].erase(itn);
+            adjList[v2].insert({v1, w1 + w2});
+            hash.erase({v2, v1});
+            hash.insert({{v2, v1}, vector<Vertex>(tmp.rbegin(), tmp.rend())});
+          }
         }
       }
     }

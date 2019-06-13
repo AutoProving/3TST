@@ -7,6 +7,7 @@
 #include <set>
 #include <sstream>
 #include <vector>
+#include <assert.h>
 
 using namespace std;
 
@@ -62,3 +63,5 @@ public:
   // contract node of degree 2 and return a map which store the contracted path
   map<pair<Vertex, Vertex>, vector<Vertex>> contract();
 };
+
+void check(const Graph &G);
