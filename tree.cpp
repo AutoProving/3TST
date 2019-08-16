@@ -142,45 +142,33 @@ Tree::Tree(const Graph &G, istream &input)
   while (line.size() == 0 || line[0] != 'V')
     getline(input, line);
 
-  Vertex root_index = G.numberVertices;
-  vector<Vertex> tree(G.numberVertices, -1);
+  vector<vector<Vertex>> tree(G.numberVertices, vector<Vertex>(0,-1));
   while (getline(input, line)) {
     Vertex v1, v2;
     std::stringstream(line) >> v1 >> v2;
     v1--;
     v2--;
-    Vertex parent, child;
-    if (tree[v1] == -1) {
-      parent = v2;
-      child = v1;
-    } else {
-      parent = v1;
-      child = v2;
-      if (tree[v2] != -1) {
-        Vertex tmp1 = v2, tmp2 = tree[v2];
-        tree[v2] = -1;
-        while (tmp2 != -1) {
-          Vertex tmp = tree[tmp2];
-          tree[tmp2] = tmp1;
-          tmp1 = tmp2;
-          tmp2 = tmp;
-        }
-      }
-    }
-    tree[child] = parent;
-    root_index = parent;
+    tree[v1].push_back(v2);
+    tree[v2].push_back(v1);
   }
 
   vector<shared_ptr<treeNode>> nodes;
   for (int i = 0; i < G.numberVertices; ++i) {
     nodes.push_back(shared_ptr<treeNode>(new treeNode(i)));
   }
+  vector<Vertex> dfs;
+  dfs.reserve(G.numberVertices);
+  dfs.push_back(G.terminals[0]);
+  root = nodes[G.terminals[0]];
   for (int i = 0; i < G.numberVertices; ++i) {
-    if (tree[i] != -1) {
-      nodes[i]->parent = nodes[tree[i]].get();
-      nodes[i]->w = G.adjList[i].find(tree[i])->second;
-      nodes[tree[i]]->addChild(nodes[i]);
-    }
+      Vertex u = dfs[i];
+      for(auto& v:tree[u]){
+          if (nodes[u]->parent == NULL || nodes[u]->parent->v != v){
+              nodes[v]->parent = nodes[u].get();
+              nodes[v]->w = G.adjList[v].find(u)->second;
+              nodes[u]->addChild(nodes[v]);
+              dfs.push_back(v);
+          }
+      }
   }
-  root = nodes[root_index];
 }
