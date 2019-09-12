@@ -1,7 +1,7 @@
 CXX=g++
 RM=rm -f
-#CPPFLAGS=-g -W -Wall -Winline -Wextra
-CPPFLAGS=-O3 -march=native -flto
+#CPPFLAGS=-std=c++11 -g -W -Wall -Winline -Wextra
+CPPFLAGS=-std=c++11 -O3 -march=native -flto
 
 SRCS=graph.cpp init.cpp main.cpp opt.cpp tree.cpp
 OBJS=$(subst .cpp,.o,$(SRCS))
