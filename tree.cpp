@@ -75,6 +75,7 @@ void Tree::print(const map<pair<Vertex, Vertex>, vector<Vertex>> &hash) {
       next.push(it->second);
     }
   }
+  cout.flush();
 }
 
 void Tree::pruneRoot() {
