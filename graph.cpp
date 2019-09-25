@@ -69,18 +69,22 @@ bool cmp(const pair<Weight, Vertex> &x, const pair<Weight, Vertex> &y) {
   return x.first > y.first;
 }
 
+bool cmp1(const unsigned long int &x, const unsigned long int &y) {
+  return x > y;
+}
+
 void dijkstra(const vector<map<Vertex, Weight>> &adjList,
               vector<Weight> &min_distance, vector<Vertex> &origin,
               Vertex source) {
   min_distance[source] = 0;
-  vector<pair<Weight, Vertex>> active_vertices;
+  vector<unsigned long int> active_vertices;
   active_vertices.reserve(adjList.size());
-  active_vertices.push_back({0, source});
+  active_vertices.push_back(source);
   vector<bool> notseen(adjList.size(), true);
 
   while (!active_vertices.empty()) {
-    std::pop_heap(active_vertices.begin(), active_vertices.end(), cmp);
-    Vertex where = active_vertices.back().second;
+    std::pop_heap(active_vertices.begin(), active_vertices.end(), cmp1);
+    Vertex where = get_vertex(active_vertices.back());
     active_vertices.pop_back();
     if (notseen[where]) {
       for (std::map<Vertex, Weight>::const_iterator it = adjList[where].begin();
@@ -88,8 +92,8 @@ void dijkstra(const vector<map<Vertex, Weight>> &adjList,
         if (min_distance[it->first] > min_distance[where] + it->second) {
           min_distance[it->first] = min_distance[where] + it->second;
           origin[it->first] = where;
-          active_vertices.push_back({min_distance[it->first], it->first});
-          push_heap(active_vertices.begin(), active_vertices.end(), cmp);
+          active_vertices.push_back(merge(min_distance[it->first], it->first));
+          push_heap(active_vertices.begin(), active_vertices.end(), cmp1);
         }
       notseen[where] = false;
     }
@@ -128,14 +132,14 @@ Vertex dijkstra(const vector<map<Vertex, Weight>> &adjList,
                 vector<Weight> &min_distance, vector<Vertex> &origin,
                 Vertex source, const vector<int> &terminalsMap, int T) {
   min_distance[source] = 0;
-  vector<pair<Weight, Vertex>> active_vertices;
+  vector<unsigned long int> active_vertices;
   active_vertices.reserve(adjList.size());
-  active_vertices.push_back({0, source});
+  active_vertices.push_back(source);
   vector<bool> notseen(adjList.size(), true);
 
   while (!active_vertices.empty()) {
-    std::pop_heap(active_vertices.begin(), active_vertices.end(), cmp);
-    Vertex where = active_vertices.back().second;
+    std::pop_heap(active_vertices.begin(), active_vertices.end(), cmp1);
+    Vertex where = get_vertex(active_vertices.back());
     active_vertices.pop_back();
     if (notseen[where]) {
       if (terminalsMap[where] != -1)
@@ -147,8 +151,8 @@ Vertex dijkstra(const vector<map<Vertex, Weight>> &adjList,
         if (min_distance[it->first] > min_distance[where] + it->second) {
           min_distance[it->first] = min_distance[where] + it->second;
           origin[it->first] = where;
-          active_vertices.push_back({min_distance[it->first], it->first});
-          push_heap(active_vertices.begin(), active_vertices.end(), cmp);
+          active_vertices.push_back(merge(min_distance[it->first], it->first));
+          push_heap(active_vertices.begin(), active_vertices.end(), cmp1);
         }
       notseen[where] = false;
     }
@@ -192,14 +196,14 @@ void dijkstra(const vector<map<Vertex, Weight>> &adjList,
               vector<Weight> &min_distance, vector<Vertex> &origin,
               Vertex source, Vertex target) {
   min_distance[source] = 0;
-  vector<pair<Weight, Vertex>> active_vertices;
+  vector<unsigned long int> active_vertices;
   active_vertices.reserve(adjList.size());
-  active_vertices.push_back({0, source});
+  active_vertices.push_back(source);
   vector<bool> notseen(adjList.size(), true);
 
   while (!active_vertices.empty()) {
-    std::pop_heap(active_vertices.begin(), active_vertices.end(), cmp);
-    Vertex where = active_vertices.back().second;
+    std::pop_heap(active_vertices.begin(), active_vertices.end(), cmp1);
+    Vertex where = get_vertex(active_vertices.back());
     active_vertices.pop_back();
     if (notseen[where]) {
       if (where == target)
@@ -209,8 +213,8 @@ void dijkstra(const vector<map<Vertex, Weight>> &adjList,
         if (min_distance[it->first] > min_distance[where] + it->second) {
           min_distance[it->first] = min_distance[where] + it->second;
           origin[it->first] = where;
-          active_vertices.push_back({min_distance[it->first], it->first});
-          push_heap(active_vertices.begin(), active_vertices.end(), cmp);
+          active_vertices.push_back(merge(min_distance[it->first], it->first));
+          push_heap(active_vertices.begin(), active_vertices.end(), cmp1);
         }
       notseen[where] = false;
     }
@@ -221,14 +225,14 @@ void dijkstra(const vector<map<Vertex, Weight>> &adjList,
               vector<Weight> &min_distance, vector<Vertex> &origin,
               Vertex source, Vertex v1, Vertex v2) {
   min_distance[source] = 0;
-  vector<pair<Weight, Vertex>> active_vertices;
+  vector<unsigned long int> active_vertices;
   active_vertices.reserve(adjList.size());
-  active_vertices.push_back({0, source});
+  active_vertices.push_back(source);
   vector<bool> notseen(adjList.size(), true);
 
   while (!active_vertices.empty()) {
-    std::pop_heap(active_vertices.begin(), active_vertices.end(), cmp);
-    Vertex where = active_vertices.back().second;
+    std::pop_heap(active_vertices.begin(), active_vertices.end(), cmp1);
+    Vertex where = get_vertex(active_vertices.back());
     active_vertices.pop_back();
     if (notseen[where]) {
       if (where == v1 || where == v2)
@@ -238,8 +242,8 @@ void dijkstra(const vector<map<Vertex, Weight>> &adjList,
         if (min_distance[it->first] > min_distance[where] + it->second) {
           min_distance[it->first] = min_distance[where] + it->second;
           origin[it->first] = where;
-          active_vertices.push_back({min_distance[it->first], it->first});
-          push_heap(active_vertices.begin(), active_vertices.end(), cmp);
+          active_vertices.push_back(merge(min_distance[it->first], it->first));
+          push_heap(active_vertices.begin(), active_vertices.end(), cmp1);
         }
       notseen[where] = false;
     }

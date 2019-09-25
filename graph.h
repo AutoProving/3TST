@@ -9,9 +9,13 @@
 #include <vector>
 #include <assert.h>
 
+#define get_weight(x) (x >> 32)
+#define get_vertex(x) (x & 4294967295)
+#define merge(w,v) (((unsigned long int) w << 32) + v)
+
 using namespace std;
 
-typedef long int Weight;
+typedef unsigned int Weight;
 
 /* global variable that defines the maximum value of a weight. This should be
    undertood as infinity. this variable is initialized in file graph.cpp */
