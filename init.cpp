@@ -30,7 +30,7 @@ Tree spanningTree(Graph &G, Vertex root) {
   return T;
 }
 
-inline void steiner_3(const vector<map<Vertex, Weight>> adjList,
+inline void steiner_3(const vector<map<Vertex, Weight>> &adjList,
                       vector<Weight> &min_distance0, vector<Vertex> &origin0,
                       Vertex v0, Vertex v1, Vertex v2) {
   vector<Weight> min_distance1(adjList.size(), MAX_WEIGHT);
@@ -304,7 +304,6 @@ Tree incrementalOptDijks3(const Graph &G, Vertex root,
     adjList = G.adjList;
     origin = full_backup_origin;
     min_distance = full_backup_distance;
-    set<pair<Weight, Vertex>> active_vertices;
     stack<shared_ptr<treeNode>> next;
     next.push(T.root);
     while (!next.empty()) {
