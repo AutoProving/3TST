@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
   signal(SIGTERM, signalHandler);
 
   Graph G(cin);
-  if (argc == 1) {
+  if (argc < 4) {
     map<pair<Vertex, Vertex>, vector<Vertex>> hash = G.contract();
     pair<Tree, Weight> p = complet_heuristic(G, G.terminalsMap, G.terminals);
     cout << "VALUE " << p.second << endl;
