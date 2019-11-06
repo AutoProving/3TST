@@ -498,19 +498,11 @@ pair<Tree, Weight> complet_heuristic(const Graph &G,
         apply_opt(tmp);
         w = tmp.pruneLeaves();
       } while (oldw != w);
-      if (wf > w) {
-        wf = w;
-        T.root = tmp.root;
-      }
-    }
-    if (!tle) {
-      Tree tmp = incrementalOptDijks3(G, T.root->v, terminalsMap, terminals);
-      w = tmp.pruneLeaves();
       do {
         if (tle)
           break;
         oldw = w;
-        apply_opt(tmp);
+        full_d3(tmp);
         w = tmp.pruneLeaves();
       } while (oldw != w);
       if (wf > w) {
@@ -518,14 +510,6 @@ pair<Tree, Weight> complet_heuristic(const Graph &G,
         T.root = tmp.root;
       }
     }
-    w = wf;
-    do {
-      if (tle)
-        break;
-      oldw = wf;
-      full_d3(T);
-      wf = T.pruneLeaves();
-    } while (oldw != wf);
     for (vector<Vertex>::const_iterator it = terminals.begin();
          it != terminals.end(); ++it) {
       if (tle)
@@ -537,6 +521,13 @@ pair<Tree, Weight> complet_heuristic(const Graph &G,
           break;
         oldw = w;
         apply_opt(tmp);
+        w = tmp.pruneLeaves();
+      } while (oldw != w);
+      do {
+        if (tle)
+          break;
+        oldw = w;
+        full_d3(tmp);
         w = tmp.pruneLeaves();
       } while (oldw != w);
       if (wf > w) {
