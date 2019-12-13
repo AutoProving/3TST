@@ -100,36 +100,6 @@ inline void buildUpPath(shared_ptr<treeNode> current,
   }
 }
 
-inline void opt_d2(shared_ptr<treeNode> &node, const int numberVertices,
-                   const vector<map<Vertex, Weight>> &adjList,
-                   const vector<int> &terminalsMap,
-                   vector<weak_ptr<treeNode>> &mapNode, vector<bool> &inTree) {
-  if (node->parent == NULL || tle)
-    return;
-  node->parent->children.erase(node->v);
-
-  // delete path to the first usefull parent
-  deleteUpPath(node->parent, terminalsMap, inTree);
-
-  node->parent = NULL;
-  node->w = MAX_WEIGHT;
-
-  set<pair<Weight, Vertex>> active_vertices;
-  vector<Weight> min_distance(numberVertices, MAX_WEIGHT);
-  vector<Vertex> origin(numberVertices, -1);
-  min_distance[node->v] = 0;
-
-  // Add vertex to the priority queue
-  initPriorityQueue(node, adjList, min_distance, origin, active_vertices);
-
-  // Compute the shortest path for node to the reste of the tree
-  Vertex cible =
-      dijkstra(adjList, min_distance, origin, inTree, active_vertices);
-
-  // Build the tree with origin
-  buildDownPath(adjList, min_distance, origin, cible, inTree, mapNode);
-}
-
 inline void opt_d3(const shared_ptr<treeNode> &root, shared_ptr<treeNode> &v1,
                    shared_ptr<treeNode> &v2, const int numberVertices,
                    const vector<map<Vertex, Weight>> &adjList,
@@ -394,13 +364,6 @@ void apply_opt(Tree &T) {
     if (!current.expired()) {
       shared_ptr<treeNode> node = current.lock();
 
-      // Optimisation of the path to the root
-      if (tle)
-        return;
-      if (node->children.size() > 2) {
-        opt_d2(node, T.G.numberVertices, T.G.adjList, T.terminalsMap, mapNode,
-               inTree);
-      }
       // Optimisation for node of degree 3 or more
       if (tle)
         return;
