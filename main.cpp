@@ -1,10 +1,9 @@
 #include <csignal>
 #include <iostream>
 
-#include "graph.h"
-#include "init.h"
-#include "opt.h"
-#include "tree.h"
+#include "graph.hpp"
+#include "heuristic.hpp"
+#include "tree.hpp"
 
 using namespace std;
 
@@ -22,20 +21,20 @@ int main(int argc, char **argv) {
   } else {
     Tree T(G, cin);
     Weight w, oldw = MAX_WEIGHT;
-    w = T.pruneLeaves();
+    w = T.pruneLeaves(G.terminalsMap);
     do {
       if (tle)
         break;
       oldw = w;
-      apply_opt(T);
-      w = T.pruneLeaves();
+      apply_opt(T,G);
+      w = T.pruneLeaves(G.terminalsMap);
     } while (oldw != w);
     do {
       if (tle)
         break;
       oldw = w;
-      full_d3(T);
-      w = T.pruneLeaves();
+      full_d3(T,G);
+      w = T.pruneLeaves(G.terminalsMap);
     } while (oldw != w);
     cout << "VALUE " << w << endl;
     T.print();

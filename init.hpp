@@ -2,11 +2,11 @@
 
 #include <stack>
 
-#include "graph.h"
-#include "opt.h"
-#include "tree.h"
+#include "graph.hpp"
+#include "opt.hpp"
+#include "tree.hpp"
+#include "dijkstra.hpp"
 
-Tree spanningTree(Graph &G, Vertex root);
 Tree incrementalDijks3(const Graph &G, Vertex root,
                        const vector<int> &terminalsMap,
                        const vector<Vertex> &terminals);

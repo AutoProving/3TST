@@ -1,34 +1,4 @@
-#include "init.h"
-
-Tree spanningTree(Graph &G, Vertex root) {
-  if (root < 0 || root > G.numberVertices)
-    throw "spanningTree";
-  Tree T(G, root);
-  set<pair<Weight, pair<Vertex, Vertex>>> next;
-  map<Vertex, shared_ptr<treeNode>> nodes;
-  nodes.insert(pair<Vertex, shared_ptr<treeNode>>(root, T.root));
-  for (map<Vertex, Weight>::const_iterator it = G.adjList[root].begin();
-       it != G.adjList[root].end(); ++it) {
-    next.insert({it->second, {root, it->first}});
-  }
-  while (!next.empty()) {
-    pair<Vertex, Vertex> current = next.begin()->second;
-    Weight w = next.begin()->first;
-    next.erase(next.begin());
-    if (nodes.find(current.second) == nodes.end()) {
-      shared_ptr<treeNode> parent = nodes.find(current.first)->second;
-      shared_ptr<treeNode> N = parent->addChild(current.second, w);
-      nodes.insert(pair<Vertex, shared_ptr<treeNode>>(current.first, N));
-      for (map<Vertex, Weight>::const_iterator it =
-               G.adjList[current.second].begin();
-           it != G.adjList[current.second].end(); ++it) {
-        if (nodes.find(it->first) == nodes.end())
-          next.insert({it->second, {current.second, it->first}});
-      }
-    }
-  }
-  return T;
-}
+#include "init.hpp"
 
 inline void steiner_3(const vector<map<Vertex, Weight>> &adjList,
                       vector<Weight> &min_distance0, vector<Vertex> &origin0,
@@ -164,17 +134,12 @@ Tree incrementalDijks3(const Graph &G, Vertex root,
   }
 
   // build tree
-  Tree T(G, root, terminalsMap, terminals);
-  vector<shared_ptr<treeNode>> nodes;
-  for (int i = 0; i < G.numberVertices; ++i) {
-    nodes.push_back(shared_ptr<treeNode>(new treeNode(i)));
-  }
-  nodes[root] = T.root;
+  Tree T(G, root);
   for (int i = 0; i < G.numberVertices; ++i) {
     if (origin[i] != -1) {
-      nodes[i]->parent = nodes[origin[i]].get();
-      nodes[i]->w = G.adjList[i].find(origin[i])->second;
-      nodes[origin[i]]->addChild(nodes[i]);
+      T.tree[i].parent = origin[i];
+      T.tree[i].weight = G.adjList[i].find(origin[i])->second;
+      T.tree[origin[i]].children.insert(i);
     }
   }
   return T;
@@ -276,27 +241,21 @@ Tree incrementalOptDijks3(const Graph &G, Vertex root,
       }
     }
 
-    Tree T(G, root, current_terminalsMap, current_terminals);
-    vector<shared_ptr<treeNode>> nodes;
-    nodes.reserve(G.numberVertices);
-    for (int i = 0; i < G.numberVertices; ++i) {
-      nodes.push_back(shared_ptr<treeNode>(new treeNode(i)));
-    }
-    nodes[root] = T.root;
+    Tree T(G, root);
     for (int i = 0; i < G.numberVertices; ++i) {
       if (origin[i] != -1) {
-        nodes[i]->parent = nodes[origin[i]].get();
-        nodes[i]->w = G.adjList[i].find(origin[i])->second;
-        nodes[origin[i]]->addChild(nodes[i]);
+        T.tree[i].parent = origin[i];
+        T.tree[i].weight = G.adjList[i].find(origin[i])->second;
+        T.tree[origin[i]].children.insert(i);
       }
     }
-    Weight oldw, w = T.pruneLeaves();
+    Weight oldw, w = T.pruneLeaves(G.terminalsMap);
     do {
       if (tle)
         break;
       oldw = w;
-      apply_opt(T);
-      w = T.pruneLeaves();
+      apply_opt(T, G);
+      w = T.pruneLeaves(G.terminalsMap);
     } while (oldw != w);
 
     if (tle)
@@ -304,19 +263,19 @@ Tree incrementalOptDijks3(const Graph &G, Vertex root,
     adjList = G.adjList;
     origin = full_backup_origin;
     min_distance = full_backup_distance;
-    stack<shared_ptr<treeNode>> next;
+    stack<Vertex> next;
     next.push(T.root);
     while (!next.empty()) {
-      shared_ptr<treeNode> current = next.top();
+      Vertex current = next.top();
       next.pop();
-      for (map<Vertex, shared_ptr<treeNode>>::iterator it =
-               current->children.begin();
-           it != current->children.end(); ++it) {
-        next.push(it->second);
-        min_distance[it->first] = MAX_WEIGHT;
-        origin[it->first] = -1;
-        adjList[current->v][it->first] = 0;
-        adjList[it->first][current->v] = 0;
+      for (set<Vertex>::iterator it =
+               T.tree[current].children.begin();
+           it != T.tree[current].children.end(); ++it) {
+        next.push(*it);
+        min_distance[*it] = MAX_WEIGHT;
+        origin[*it] = -1;
+        adjList[current][*it] = 0;
+        adjList[*it][current] = 0;
       }
     }
     if (tle)
@@ -338,18 +297,12 @@ Tree incrementalOptDijks3(const Graph &G, Vertex root,
   }
 
   // build tree
-  Tree T(G, root, terminalsMap, terminals);
-  vector<shared_ptr<treeNode>> nodes;
-  nodes.reserve(G.numberVertices);
-  for (int i = 0; i < G.numberVertices; ++i) {
-    nodes.push_back(shared_ptr<treeNode>(new treeNode(i)));
-  }
-  nodes[root] = T.root;
+  Tree T(G, root);
   for (int i = 0; i < G.numberVertices; ++i) {
     if (origin[i] != -1) {
-      nodes[i]->parent = nodes[origin[i]].get();
-      nodes[i]->w = G.adjList[i].find(origin[i])->second;
-      nodes[origin[i]]->addChild(nodes[i]);
+      T.tree[i].parent = origin[i];
+      T.tree[i].weight = G.adjList[i].find(origin[i])->second;
+      T.tree[origin[i]].children.insert(i);
     }
   }
   return T;

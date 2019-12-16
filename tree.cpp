@@ -1,118 +1,129 @@
-#include "tree.h"
+#include "tree.hpp"
 
 using namespace std;
 
-shared_ptr<treeNode> treeNode::addChild(Vertex v, Weight w) {
-  shared_ptr<treeNode> child(new treeNode(v, w, this));
-  children.insert({v, child});
-  return child;
-}
+void treeNode::remove(Vertex v) { children.erase(v); }
 
-shared_ptr<treeNode> treeNode::addChild(shared_ptr<treeNode> N) {
-  children.insert(pair<Vertex, shared_ptr<treeNode>>(N->v, N));
-  return N;
-}
-
-void treeNode::print() {
-  cout << "Node: " << v;
-  if (parent)
-    cout << " ,parent: " << parent->v << " weight: " << w;
-  cout << endl;
-}
-
-void treeNode::printSubTree() {
-  stack<treeNode> next;
-  next.push(*this);
-  while (!next.empty()) {
-    treeNode current = next.top();
-    next.pop();
-    for (map<Vertex, shared_ptr<treeNode>>::iterator it =
-             current.children.begin();
-         it != current.children.end(); ++it) {
-      cout << current.v + 1 << " " << it->first + 1 << endl;
-      next.push(*it->second);
+bool Tree::check(const Graph &G) {
+  bool b = true;
+  int r = 0;
+  for (unsigned int i = 0; i < tree.size(); ++i) {
+    if (tree[i].parent >= 0) {
+      if (tree[tree[i].parent].children.find(i) ==
+          tree[tree[i].parent].children.end()) {
+        cout << "parent " << i << " " << tree[i].parent << endl;
+        throw 20;
+      }
+      auto it = G.adjList[tree[i].parent].find(i);
+      if (it ==  G.adjList[tree[i].parent].end()){
+          cout << "graph" << endl;
+          throw 10;
+      }else{
+          if (tree[i].weight != it->second){
+              cout << "weight " << tree[i].weight << " " << it->second << endl;
+              throw 10;
+          }
+      }
+    } else {
+      if (tree[i].parent == -1) {
+        if (++r > 1) {
+          cout << "Too many root" << endl;
+          throw 30;
+        }
+      } else {
+        if (tree[i].parent != -2) {
+          cout << "unknown value " << tree[i].parent << endl;
+          throw 50;
+        }
+      }
+    }
+    for (auto c : tree[i].children) {
+      if ((unsigned int)tree[c].parent != i) {
+        cout << "child " << c << " " << i;
+        throw 40;
+      }
     }
   }
+  return b;
 }
 
-int treeNode::pruneLeaves(const vector<int> &terminalsMap) {
-  int tmp = 0;
-  map<Vertex, shared_ptr<treeNode>> backup = children;
-  for (map<Vertex, shared_ptr<treeNode>>::iterator it = backup.begin();
-       it != backup.end(); ++it) {
-    tmp += it->second->pruneLeaves(terminalsMap);
-  }
-  if (children.empty() && terminalsMap[v] == -1) {
-    parent->children.erase(v);
-  } else {
-    if (parent)
-      tmp += w;
-  }
-  return tmp;
-}
-
-void Tree::print() { root->printSubTree(); }
-
-void Tree::print(const map<pair<Vertex, Vertex>, vector<Vertex>> &hash) {
-  stack<shared_ptr<treeNode>> next;
+void Tree::print() {
+  stack<Vertex> next;
   next.push(root);
   while (!next.empty()) {
-    shared_ptr<treeNode> current = next.top();
+    Vertex current = next.top();
     next.pop();
-    for (map<Vertex, shared_ptr<treeNode>>::iterator it =
-             current->children.begin();
-         it != current->children.end(); ++it) {
-      cout << current->v + 1 << " ";
+    for (set<Vertex>::iterator it = tree[current].children.begin();
+         it != tree[current].children.end(); ++it) {
+      cout << current + 1 << " " << *it + 1 << endl;
+      next.push(*it);
+    }
+  }
+  cout.flush();
+}
+
+void Tree::print(const map<pair<Vertex, Vertex>, vector<Vertex>> &hash) {
+  stack<Vertex> next;
+  next.push(root);
+  while (!next.empty()) {
+    Vertex current = next.top();
+    next.pop();
+    for (set<Vertex>::iterator it = tree[current].children.begin();
+         it != tree[current].children.end(); ++it) {
+      cout << current + 1 << " ";
       map<pair<Vertex, Vertex>, vector<Vertex>>::const_iterator it_path =
-          hash.find({current->v, it->first});
+          hash.find({current, *it});
       if (it_path != hash.end()) {
         for (vector<Vertex>::const_iterator path = it_path->second.begin();
              path != it_path->second.end(); ++path) {
           cout << *path + 1 << endl << *path + 1 << " ";
         }
       }
-      cout << it->first + 1 << endl;
-      next.push(it->second);
+      cout << *it + 1 << endl;
+      next.push(*it);
     }
   }
   cout.flush();
 }
 
-void Tree::pruneRoot() {
-  if (root->children.size() == 1 && terminalsMap[root->v] == -1) {
-    root = root->children.begin()->second;
-    root->parent = NULL;
-    root->w = MAX_WEIGHT;
-    pruneRoot();
+void Tree::pruneRoot(const vector<int> &terminalsMap) {
+  if (tree[root].children.size() == 1 && terminalsMap[root] == -1) {
+    Vertex new_root = *(tree[root].children.begin());
+    tree[root].parent = -2;
+    tree[root].children.clear();
+    root = new_root;
+    tree[root].parent = -1;
+    tree[root].weight = 0;
+    pruneRoot(terminalsMap);
   }
 }
 
-Weight Tree::pruneLeaves() {
+Weight Tree::pruneLeaves(const vector<int> &terminalsMap) {
   Weight tmp = 0;
-  stack<shared_ptr<treeNode>> next;
-  vector<shared_ptr<treeNode>> to_clean;
+  stack<Vertex> next;
+  vector<Vertex> to_clean;
   next.push(root);
   while (!next.empty()) {
-    shared_ptr<treeNode> current = next.top();
+    Vertex current = next.top();
     next.pop();
-    for (map<Vertex, shared_ptr<treeNode>>::iterator it =
-             current->children.begin();
-         it != current->children.end(); ++it) {
-      if (it->second->children.size() == 0 && terminalsMap[it->first] == -1)
-        to_clean.push_back(it->second);
-      next.push(it->second);
-      tmp += it->second->w;
+    for (set<Vertex>::iterator it = tree[current].children.begin();
+         it != tree[current].children.end(); ++it) {
+      if (tree[*it].children.size() == 0 && terminalsMap[*it] == -1)
+        to_clean.push_back(*it);
+      next.push(*it);
+      tmp += tree[*it].weight;
     }
   }
 
-  for (vector<shared_ptr<treeNode>>::iterator it = to_clean.begin();
-       it != to_clean.end(); ++it) {
-    treeNode *current = it->get();
-    while (current->children.size() == 0 && terminalsMap[current->v] == -1 &&
-           current->parent != NULL) {
-      tmp -= current->w;
-      treeNode *next = current->parent;
-      current->parent->children.erase(current->v);
+  for (vector<Vertex>::iterator it = to_clean.begin(); it != to_clean.end();
+       ++it) {
+    Vertex current = *it;
+    while (tree[current].children.size() == 0 && terminalsMap[current] == -1 &&
+           tree[current].parent >= 0) {
+      tmp -= tree[current].weight;
+      Vertex next = tree[current].parent;
+      tree[next].remove(current);
+      tree[current].parent = -2;
       current = next;
     }
   }
@@ -121,55 +132,57 @@ Weight Tree::pruneLeaves() {
 
 int Tree::size() {
   int tmp = 0;
-  stack<shared_ptr<treeNode>> next;
+  stack<Vertex> next;
   next.push(root);
   while (!next.empty()) {
-    shared_ptr<treeNode> current = next.top();
+    Vertex current = next.top();
     next.pop();
-    for (map<Vertex, shared_ptr<treeNode>>::iterator it =
-             current->children.begin();
-         it != current->children.end(); ++it) {
-      next.push(it->second);
-      tmp += it->second->w;
+    for (set<Vertex>::iterator it = tree[current].children.begin();
+         it != tree[current].children.end(); ++it) {
+      next.push(*it);
+      tmp += tree[*it].weight;
     }
   }
 
   return tmp;
 }
 
-Tree::Tree(const Graph &G, istream &input)
-    : G{G}, terminalsMap{G.terminalsMap}, terminals{G.terminals} {
+Tree::Tree(const Graph &G, Vertex root) : root{root} {
+  tree.resize(G.numberVertices, treeNode());
+  tree[root].parent = -1;
+}
+
+Tree::Tree(const Graph &G, istream &input) {
   std::string line;
   while (line.size() == 0 || line[0] != 'V')
     getline(input, line);
 
-  vector<vector<Vertex>> tree(G.numberVertices, vector<Vertex>(0,-1));
+  vector<vector<Vertex>> graph(G.numberVertices, vector<Vertex>(0, -1));
   while (getline(input, line)) {
     Vertex v1, v2;
     std::stringstream(line) >> v1 >> v2;
     v1--;
     v2--;
-    tree[v1].push_back(v2);
-    tree[v2].push_back(v1);
+    graph[v1].push_back(v2);
+    graph[v2].push_back(v1);
   }
 
-  vector<shared_ptr<treeNode>> nodes;
-  for (int i = 0; i < G.numberVertices; ++i) {
-    nodes.push_back(shared_ptr<treeNode>(new treeNode(i)));
-  }
+  tree.resize(G.numberVertices);
+
   vector<Vertex> dfs;
   dfs.reserve(G.numberVertices);
-  dfs.push_back(G.terminals[0]);
-  root = nodes[G.terminals[0]];
+  root = G.terminals[0];
+  dfs.push_back(root);
+  tree[root].parent = -1;
   for (int i = 0; i < G.numberVertices; ++i) {
-      Vertex u = dfs[i];
-      for(auto& v:tree[u]){
-          if (nodes[u]->parent == NULL || nodes[u]->parent->v != v){
-              nodes[v]->parent = nodes[u].get();
-              nodes[v]->w = G.adjList[v].find(u)->second;
-              nodes[u]->addChild(nodes[v]);
-              dfs.push_back(v);
-          }
+    Vertex u = dfs[i];
+    for (auto &v : graph[u]) {
+      if (tree[v].parent == -2) {
+        tree[u].children.insert(v);
+        tree[v].parent = u;
+        tree[v].weight = G.adjList[v].find(u)->second;
+        dfs.push_back(v);
       }
+    }
   }
 }

@@ -1,13 +1,14 @@
 #pragma once
 
 #include <algorithm>
+#include <assert.h>
 #include <climits> // this is for the maximum size of an integer (maximum size of a weight)
 #include <iostream>
 #include <map>
 #include <set>
 #include <sstream>
 #include <vector>
-#include <assert.h>
+
 
 using namespace std;
 
@@ -17,26 +18,6 @@ typedef long int Weight;
    undertood as infinity. this variable is initialized in file graph.cpp */
 extern Weight MAX_WEIGHT;
 typedef int Vertex;
-
-void dijkstra(const vector<map<Vertex, Weight>> &adjList,
-              vector<Weight> &min_distance, vector<Vertex> &origin,
-              Vertex source);
-Vertex dijkstra(const vector<map<Vertex, Weight>> &adjList,
-                vector<Weight> &min_distance, vector<Vertex> &origin,
-                Vertex source, const vector<int> &terminalsMap, int T);
-void dijkstra(const vector<map<Vertex, Weight>> &adjList,
-              vector<Weight> &min_distance, vector<Vertex> &origin,
-              Vertex source, Vertex v1, Vertex v2);
-void dijkstra(const vector<map<Vertex, Weight>> &adjList,
-              vector<Weight> &min_distance, vector<Vertex> &origin,
-              Vertex source, Vertex target);
-Vertex dijkstra(const vector<map<Vertex, Weight>> &adjList,
-                vector<Weight> &min_distance, vector<Vertex> &origin,
-                vector<bool> &inTree,
-                set<pair<Weight, Vertex>> &active_vertices);
-void dijkstra(const vector<map<Vertex, Weight>> &adjList,
-              vector<Weight> &min_distance, vector<Vertex> &origin,
-              set<pair<Weight, Vertex>> &active_vertices);
 
 class Graph {
 public:
@@ -63,5 +44,3 @@ public:
   // contract node of degree 2 and return a map which store the contracted path
   map<pair<Vertex, Vertex>, vector<Vertex>> contract();
 };
-
-void check(const Graph &G);
