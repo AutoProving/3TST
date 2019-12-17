@@ -47,7 +47,7 @@ inline void steiner_3(const vector<map<Vertex, Weight>> &adjList,
   }
 }
 
-//TODO This can be simply by the algo from the paper. Try to rewrite it
+// TODO This can be simply by the algo from the paper. Try to rewrite it
 Tree incrementalDijks3(const Graph &G, Vertex root,
                        const vector<int> &terminalsMap,
                        const vector<Vertex> &terminals) {
@@ -67,7 +67,8 @@ Tree incrementalDijks3(const Graph &G, Vertex root,
       vector<Vertex> backup_origin = origin;
 
       // Update graph, set edge to 0
-      last_far = far; //TODO: virer, inutile, il faut juste un valeur far pour chaque cas du if, pas besoin de copier
+      last_far = far; // TODO: virer, inutile, il faut juste un valeur far pour
+                      // chaque cas du if, pas besoin de copier
       Vertex current = far;
       while (origin[current] != -1 && backup_distance[current] != 0) {
         backup_distance[current] = 0;
@@ -116,19 +117,14 @@ Tree incrementalDijks3(const Graph &G, Vertex root,
         min_distance[current] = MAX_WEIGHT;
         current = origin[current];
       }
-      far = dijkstra(adjList, min_distance, origin, root, terminalsMap,
-                     terminals.size()); //TODO Change to simple dijkstra, quand les nœuds sont dans l'arbre courant ils ne peuvent pas être attiends c'est plus lent pour rien. Soit mettre le simple ou faire un truc un peu plus intelligent mais ça ne vaut pas le coup en terme de gain de temps.
-      if (far == -1) {
-        far_dist = 0;
-        for (vector<Vertex>::const_iterator it = terminals.begin();
-             it != terminals.end(); ++it) {
-          if (far_dist < min_distance[*it]) {
-            far_dist = min_distance[*it];
-            far = *it;
-          }
+      dijkstra(adjList, min_distance, origin, root);
+      far_dist = 0;
+      for (vector<Vertex>::const_iterator it = terminals.begin();
+           it != terminals.end(); ++it) {
+        if (far_dist < min_distance[*it]) {
+          far_dist = min_distance[*it];
+          far = *it;
         }
-      } else {
-        far_dist = min_distance[far];
       }
     }
   }
@@ -224,19 +220,14 @@ Tree incrementalOptDijks3(const Graph &G, Vertex root,
           min_distance[current] = MAX_WEIGHT;
           current = origin[current];
         }
-        far = dijkstra(adjList, min_distance, origin, root, terminalsMap,
-                       terminals.size());
-        if (far == -1) {
-          far_dist = 0;
-          for (vector<Vertex>::const_iterator it = terminals.begin();
-               it != terminals.end(); ++it) {
-            if (far_dist < min_distance[*it]) {
-              far_dist = min_distance[*it];
-              far = *it;
-            }
+        dijkstra(adjList, min_distance, origin, root);
+        far_dist = 0;
+        for (vector<Vertex>::const_iterator it = terminals.begin();
+             it != terminals.end(); ++it) {
+          if (far_dist < min_distance[*it]) {
+            far_dist = min_distance[*it];
+            far = *it;
           }
-        } else {
-          far_dist = min_distance[far];
         }
       }
     }
@@ -268,8 +259,7 @@ Tree incrementalOptDijks3(const Graph &G, Vertex root,
     while (!next.empty()) {
       Vertex current = next.top();
       next.pop();
-      for (set<Vertex>::iterator it =
-               T.tree[current].children.begin();
+      for (set<Vertex>::iterator it = T.tree[current].children.begin();
            it != T.tree[current].children.end(); ++it) {
         next.push(*it);
         min_distance[*it] = MAX_WEIGHT;
@@ -280,19 +270,14 @@ Tree incrementalOptDijks3(const Graph &G, Vertex root,
     }
     if (tle)
       break;
-    far = dijkstra(adjList, min_distance, origin, root, terminalsMap,
-                   terminals.size());
-    if (far == -1) {
-      far_dist = 0;
-      for (vector<Vertex>::const_iterator it = terminals.begin();
-           it != terminals.end(); ++it) {
-        if (far_dist < min_distance[*it]) {
-          far_dist = min_distance[*it];
-          far = *it;
-        }
+    dijkstra(adjList, min_distance, origin, root);
+    far_dist = 0;
+    for (vector<Vertex>::const_iterator it = terminals.begin();
+         it != terminals.end(); ++it) {
+      if (far_dist < min_distance[*it]) {
+        far_dist = min_distance[*it];
+        far = *it;
       }
-    } else {
-      far_dist = min_distance[far];
     }
   }
 
