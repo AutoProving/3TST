@@ -9,7 +9,6 @@
 #include <sstream>
 #include <vector>
 
-
 using namespace std;
 
 typedef long int Weight;
@@ -24,9 +23,6 @@ public:
   // A graph is represented by its adjacency list.
   // a weighted edge (i,j,w) belongs to the graph if the pair (j,w) belongs to
   // adjList[i].
-  int numberVertices;
-  int numberEdges;
-  int numberTerminals;
   vector<std::map<Vertex, Weight>> adjList;
   // the vector terminals has as many positions as terminals. position i is the
   // i-th terminal
@@ -36,6 +32,9 @@ public:
   // terminals[j] = i.
   vector<int> terminalsMap;
 
+  Graph(vector<int> terminals, vector<int> terminalsMap)
+      : adjList{vector<std::map<Vertex, Weight>>(terminalsMap.size())},
+        terminals{terminals}, terminalsMap{terminalsMap} {};
   explicit Graph(istream &input);
   void print();
   bool find_next(std::istream &input, const std::string &pat,

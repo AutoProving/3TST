@@ -86,7 +86,7 @@ inline void buildUpPath(const vector<map<Vertex, Weight>> &adjList,
   }
 }
 
-inline void opt_d3(Vertex root, Vertex v1, Vertex v2, const int numberVertices,
+inline void opt_d3(Vertex root, Vertex v1, Vertex v2,
                    const vector<map<Vertex, Weight>> &adjList,
                    vector<Vertex> terminalsMap, Tree &T) {
 
@@ -117,8 +117,8 @@ inline void opt_d3(Vertex root, Vertex v1, Vertex v2, const int numberVertices,
 
   // Dijkstra from v1
   set<pair<Weight, Vertex>> active_vertices;
-  vector<Weight> min_distance1(numberVertices, MAX_WEIGHT);
-  vector<Vertex> origin1(numberVertices, -1);
+  vector<Weight> min_distance1(adjList.size(), MAX_WEIGHT);
+  vector<Vertex> origin1(adjList.size(), -1);
   min_distance1[v1] = 0;
 
   initPriorityQueue(T, v1, adjList, min_distance1, origin1, active_vertices);
@@ -126,8 +126,8 @@ inline void opt_d3(Vertex root, Vertex v1, Vertex v2, const int numberVertices,
 
   // Dijkstra from v2
   active_vertices.clear();
-  vector<Weight> min_distance2(numberVertices, MAX_WEIGHT);
-  vector<Vertex> origin2(numberVertices, -1);
+  vector<Weight> min_distance2(adjList.size(), MAX_WEIGHT);
+  vector<Vertex> origin2(adjList.size(), -1);
   min_distance2[v2] = 0;
 
   initPriorityQueue(T, v2, adjList, min_distance2, origin2, active_vertices);
@@ -135,8 +135,8 @@ inline void opt_d3(Vertex root, Vertex v1, Vertex v2, const int numberVertices,
 
   // Dijkstra from root
   active_vertices.clear();
-  vector<Weight> min_distance0(numberVertices, MAX_WEIGHT);
-  vector<Vertex> origin0(numberVertices, -1);
+  vector<Weight> min_distance0(adjList.size(), MAX_WEIGHT);
+  vector<Vertex> origin0(adjList.size(), -1);
   min_distance0[root] = 0;
 
   initPriorityQueue(T, root, adjList, min_distance0, origin0, active_vertices);
@@ -170,7 +170,7 @@ inline void opt_d3(Vertex root, Vertex v1, Vertex v2, const int numberVertices,
   } else {
     distIntersect = min_distance0[c0] + min_distance1[c1];
   }
-  for (Vertex i = 0; i < numberVertices; ++i) {
+  for (unsigned int i = 0; i < adjList.size(); ++i) {
     if (min_distance2[i] != MAX_WEIGHT && min_distance1[i] != MAX_WEIGHT &&
         min_distance0[i] != MAX_WEIGHT &&
         min_distance0[i] + min_distance1[i] + min_distance2[i] <
@@ -220,7 +220,7 @@ inline void opt_d3(Vertex root, Vertex v1, Vertex v2, const int numberVertices,
   }
 }
 
-inline void opt_d3_parent(Vertex node, Tree &T, const int numberVertices,
+inline void opt_d3_parent(Vertex node, Tree &T,
                           const vector<map<Vertex, Weight>> &adjList,
                           const vector<int> &terminalsMap) {
   vector<Vertex> backup_children(T.tree[node].children.begin(),
@@ -235,11 +235,11 @@ inline void opt_d3_parent(Vertex node, Tree &T, const int numberVertices,
     Vertex v1 = *tmp_it;
     Vertex v2 = node;
 
-    opt_d3(T.root, v1, v2, numberVertices, adjList, terminalsMap, T);
+    opt_d3(T.root, v1, v2, adjList, terminalsMap, T);
   }
 }
 
-inline void opt_d3_son(Vertex node, Tree &T, const int numberVertices,
+inline void opt_d3_son(Vertex node, Tree &T,
                        const vector<map<Vertex, Weight>> &adjList,
                        const vector<int> &terminalsMap) {
   vector<Vertex> backup_children(T.tree[node].children.begin(),
@@ -259,14 +259,14 @@ inline void opt_d3_son(Vertex node, Tree &T, const int numberVertices,
       if (T.tree[node].children.find(*it2) == T.tree[node].children.end())
         continue;
 
-      opt_d3(T.root, *it1, *it2, numberVertices, adjList, terminalsMap, T);
+      opt_d3(T.root, *it1, *it2, adjList, terminalsMap, T);
     }
   }
 }
 
 void apply_opt(Tree &T, const Graph &G) {
   vector<Vertex> next_opt;
-  next_opt.reserve(G.numberVertices);
+  next_opt.reserve(G.adjList.size());
   {
     queue<Vertex> next;
     next.push(T.root);
@@ -296,14 +296,14 @@ void apply_opt(Tree &T, const Graph &G) {
       if (tle)
         return;
       if (T.tree[*it].children.size() > 1) {
-        opt_d3_son(*it, T, G.numberVertices, G.adjList, G.terminalsMap);
+        opt_d3_son(*it, T, G.adjList, G.terminalsMap);
         T.check(G);
       }
       if (tle)
         return;
       if (T.tree[*it].children.size() > 2 ||
           (T.tree[*it].children.size() == 2 && G.terminalsMap[*it] != -1)) {
-        opt_d3_parent(*it, T, G.numberVertices, G.adjList, G.terminalsMap);
+        opt_d3_parent(*it, T, G.adjList, G.terminalsMap);
         T.check(G);
       }
     }
@@ -312,7 +312,7 @@ void apply_opt(Tree &T, const Graph &G) {
 
 void full_d3(Tree &T, const Graph &G) {
   vector<Vertex> next_opt;
-  next_opt.reserve(G.numberVertices);
+  next_opt.reserve(G.adjList.size());
   {
     queue<Vertex> next;
     next.push(T.root);
@@ -343,8 +343,7 @@ void full_d3(Tree &T, const Graph &G) {
                G.terminalsMap[*it1] != -1) &&
               (T.tree[*it2].children.size() > 1 ||
                G.terminalsMap[*it2] != -1)) {
-            opt_d3(T.root, *it1, *it2, G.numberVertices, G.adjList,
-                   G.terminalsMap, T);
+            opt_d3(T.root, *it1, *it2, G.adjList, G.terminalsMap, T);
           }
         }
       }

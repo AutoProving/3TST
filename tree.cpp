@@ -148,7 +148,7 @@ int Tree::size() {
 }
 
 Tree::Tree(const Graph &G, Vertex root) : root{root} {
-  tree.resize(G.numberVertices, treeNode());
+  tree.resize(G.adjList.size(), treeNode());
   tree[root].parent = -1;
 }
 
@@ -157,7 +157,7 @@ Tree::Tree(const Graph &G, istream &input) {
   while (line.size() == 0 || line[0] != 'V')
     getline(input, line);
 
-  vector<vector<Vertex>> graph(G.numberVertices, vector<Vertex>(0, -1));
+  vector<vector<Vertex>> graph(G.adjList.size(), vector<Vertex>(0, -1));
   while (getline(input, line)) {
     Vertex v1, v2;
     std::stringstream(line) >> v1 >> v2;
@@ -167,14 +167,14 @@ Tree::Tree(const Graph &G, istream &input) {
     graph[v2].push_back(v1);
   }
 
-  tree.resize(G.numberVertices);
+  tree.resize(G.adjList.size());
 
   vector<Vertex> dfs;
-  dfs.reserve(G.numberVertices);
+  dfs.reserve(G.adjList.size());
   root = G.terminals[0];
   dfs.push_back(root);
   tree[root].parent = -1;
-  for (int i = 0; i < G.numberVertices; ++i) {
+  for (unsigned int i = 0; i < G.adjList.size(); ++i) {
     Vertex u = dfs[i];
     for (auto &v : graph[u]) {
       if (tree[v].parent == -2) {

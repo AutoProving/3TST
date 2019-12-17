@@ -52,8 +52,8 @@ Tree incrementalDijks3(const Graph &G, Vertex root,
                        const vector<int> &terminalsMap,
                        const vector<Vertex> &terminals) {
   vector<std::map<Vertex, Weight>> adjList = G.adjList;
-  vector<Weight> min_distance(G.numberVertices, MAX_WEIGHT);
-  vector<Vertex> origin(G.numberVertices, -1);
+  vector<Weight> min_distance(G.adjList.size(), MAX_WEIGHT);
+  vector<Vertex> origin(G.adjList.size(), -1);
   Vertex far = dijkstra(adjList, min_distance, origin, root, terminalsMap,
                         terminals.size());
   Weight far_dist = min_distance[far];
@@ -131,7 +131,7 @@ Tree incrementalDijks3(const Graph &G, Vertex root,
 
   // build tree
   Tree T(G, root);
-  for (int i = 0; i < G.numberVertices; ++i) {
+  for (unsigned int i = 0; i < G.adjList.size(); ++i) {
     if (origin[i] != -1) {
       T.tree[i].parent = origin[i];
       T.tree[i].weight = G.adjList[i].find(origin[i])->second;
@@ -145,8 +145,8 @@ Tree incrementalOptDijks3(const Graph &G, Vertex root,
                           const vector<int> &terminalsMap,
                           const vector<Vertex> &terminals) {
   vector<std::map<Vertex, Weight>> adjList = G.adjList;
-  vector<Weight> min_distance(G.numberVertices, MAX_WEIGHT);
-  vector<Vertex> origin(G.numberVertices, -1);
+  vector<Weight> min_distance(G.adjList.size(), MAX_WEIGHT);
+  vector<Vertex> origin(G.adjList.size(), -1);
   Vertex far = dijkstra(adjList, min_distance, origin, root, terminalsMap,
                         terminals.size());
   Weight far_dist = min_distance[far];
@@ -233,7 +233,7 @@ Tree incrementalOptDijks3(const Graph &G, Vertex root,
     }
 
     Tree T(G, root);
-    for (int i = 0; i < G.numberVertices; ++i) {
+    for (unsigned int i = 0; i < G.adjList.size(); ++i) {
       if (origin[i] != -1) {
         T.tree[i].parent = origin[i];
         T.tree[i].weight = G.adjList[i].find(origin[i])->second;
@@ -283,7 +283,7 @@ Tree incrementalOptDijks3(const Graph &G, Vertex root,
 
   // build tree
   Tree T(G, root);
-  for (int i = 0; i < G.numberVertices; ++i) {
+  for (unsigned int i = 0; i < G.adjList.size(); ++i) {
     if (origin[i] != -1) {
       T.tree[i].parent = origin[i];
       T.tree[i].weight = G.adjList[i].find(origin[i])->second;

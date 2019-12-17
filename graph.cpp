@@ -7,25 +7,26 @@ Weight MAX_WEIGHT =
 
 Graph::Graph(istream &input) {
   std::string line;
+  int numberEdges, numberTerminals, numberVertices;
 
   // Find graph section
   find_next(input, "SECTION Graph", line);
 
   // Get number of vertices
   getline(input, line);
-  std::stringstream(line).ignore(256, ' ') >> (this->numberVertices);
-  adjList.reserve(this->numberVertices);
-  for (int i = 0; i < this->numberVertices; i++) {
+  std::stringstream(line).ignore(256, ' ') >> (numberVertices);
+  adjList.reserve(numberVertices);
+  for (int i = 0; i < numberVertices; i++) {
     std::map<Vertex, Weight> tmpmap; // creates an empty map.
     adjList.push_back(tmpmap);
   }
 
   // Get number of edges
   getline(input, line);
-  std::stringstream(line).ignore(256, ' ') >> (this->numberEdges);
+  std::stringstream(line).ignore(256, ' ') >> (numberEdges);
 
   // Read edges
-  for (int i = 0; i < (this->numberEdges); ++i) {
+  for (int i = 0; i < (numberEdges); ++i) {
     Vertex v1, v2;
     Weight w;
     getline(input, line);
@@ -41,13 +42,13 @@ Graph::Graph(istream &input) {
 
   // Get the number of terminals
   getline(input, line);
-  std::stringstream(line).ignore(256, ' ') >> (this->numberTerminals);
+  std::stringstream(line).ignore(256, ' ') >> (numberTerminals);
 
   // initialize Terminals
-  terminals.resize(this->numberTerminals, 0);
+  terminals.resize(numberTerminals, 0);
   // all entries in terminalsMap are initialized to -1
-  terminalsMap.resize(this->numberVertices, -1);
-  for (int i = 0; i < this->numberTerminals; ++i) {
+  terminalsMap.resize(numberVertices, -1);
+  for (int i = 0; i < numberTerminals; ++i) {
     getline(input, line);
     std::stringstream(line).ignore(256, ' ') >> terminals[i];
     terminals[i]--; // subtracts 1 because vertices are numbered from 0
@@ -69,18 +70,17 @@ void Graph::print() {
   cout << endl;
   cout << "printing Graph" << endl;
   cout << endl;
-  cout << "Number of Vertices: " << this->numberVertices << endl;
-  cout << "Number of Edges: " << this->numberEdges << endl;
-  cout << "Number of Terminals: " << this->numberTerminals << endl;
+  cout << "Number of Vertices: " << adjList.size() << endl;
+  cout << "Number of Terminals: " << terminals.size() << endl;
   cout << endl;
   cout << "Terminals: " << endl;
   // print Terminals
-  for (int i = 0; i < numberTerminals; i++) {
-    cout << this->terminals[i] + 1 << " "; // adds +1 back to the vertex number
+  for (unsigned int i = 0; i < terminals.size(); i++) {
+    cout << terminals[i] + 1 << " "; // adds +1 back to the vertex number
   }
   cout << endl << endl;
   // print Edges
-  for (Vertex v1 = 0; v1 < this->numberVertices; v1++) {
+  for (unsigned int v1 = 0; v1 < adjList.size(); v1++) {
     for (std::map<Vertex, Weight>::iterator it = adjList[v1].begin();
          it != adjList[v1].end(); ++it) {
       // Obs: When printing, adds 1 back to the vertex number.
@@ -93,7 +93,7 @@ void Graph::print() {
 map<pair<Vertex, Vertex>, vector<Vertex>> Graph::contract() {
   map<pair<Vertex, Vertex>, vector<Vertex>> hash;
   // Contract vertex of degree 1
-  for (Vertex v = 0; v < numberVertices; ++v) {
+  for (unsigned int v = 0; v < adjList.size(); ++v) {
     if (terminalsMap[v] == -1 && adjList[v].size() == 1) {
       Vertex current = v;
       while (terminalsMap[current] == -1 && adjList[current].size() == 1) {
@@ -106,7 +106,7 @@ map<pair<Vertex, Vertex>, vector<Vertex>> Graph::contract() {
   }
 
   // Contract vertex of degree 2
-  for (Vertex v = 0; v < numberVertices; ++v) {
+  for (unsigned int v = 0; v < adjList.size(); ++v) {
     if (terminalsMap[v] == -1 && adjList[v].size() == 2) {
       Vertex v1 = adjList[v].begin()->first;
       Weight w1 = adjList[v].begin()->second;
