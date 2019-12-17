@@ -1,5 +1,19 @@
 #include "heuristic.hpp"
 
+Graph merge_trees(const vector<Tree> &trees, const vector<int> &terminals,
+                  const vector<int> &terminalsMap) {
+  Graph G(terminals, terminalsMap);
+  for (Tree T : trees) {
+    for (unsigned int i = 0; i < T.tree.size(); ++i) {
+      if (T.tree[i].parent >= 0) {
+        G.adjList[i].insert({T.tree[i].parent, T.tree[i].weight});
+        G.adjList[T.tree[i].parent].insert({i, T.tree[i].weight});
+      }
+    }
+  }
+  return G;
+}
+
 pair<Tree, Weight> complet_heuristic(const Graph &G,
                                      const vector<int> &terminalsMap,
                                      const vector<Vertex> &terminals) {
