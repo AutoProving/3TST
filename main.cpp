@@ -14,6 +14,9 @@ int main(int argc, char **argv) {
 
   Graph G(cin);
   if (argc < 4) {
+    if (argc == 3) {
+      srand(stoi(argv[2]));
+    }
     map<pair<Vertex, Vertex>, vector<Vertex>> hash = G.contract();
     pair<Tree, Weight> p = complet_heuristic(G, G.terminalsMap, G.terminals);
     cout << "VALUE " << p.second << endl;
@@ -26,14 +29,14 @@ int main(int argc, char **argv) {
       if (tle)
         break;
       oldw = w;
-      apply_opt(T,G);
+      apply_opt(T, G);
       w = T.pruneLeaves(G.terminalsMap);
     } while (oldw != w);
     do {
       if (tle)
         break;
       oldw = w;
-      full_d3(T,G);
+      full_d3(T, G);
       w = T.pruneLeaves(G.terminalsMap);
     } while (oldw != w);
     cout << "VALUE " << w << endl;
