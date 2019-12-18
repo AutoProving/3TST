@@ -292,3 +292,34 @@ Tree incrementalOptDijks3(const Graph &G, Vertex root,
   }
   return T;
 }
+bool cmp(const tuple<Weight, Vertex, Vertex> &x,
+         const tuple<Weight, Vertex, Vertex> &y) {
+  return get<0>(x) > get<0>(y);
+}
+
+Tree mst(const Graph &G, Vertex root) {
+  Tree T(G, root);
+  vector<tuple<Weight, Vertex, Vertex>> active_vertices;
+  for (pair<Vertex, Weight> neighbour : G.adjList[root]) {
+    active_vertices.push_back({neighbour.second, root, neighbour.first});
+  }
+  make_heap(active_vertices.begin(), active_vertices.end(), cmp);
+  while (!active_vertices.empty()) {
+    std::pop_heap(active_vertices.begin(), active_vertices.end(), cmp);
+    tuple<Weight, Vertex, Vertex> edge = active_vertices.back();
+    active_vertices.pop_back();
+    if (T.tree[get<2>(edge)].parent == -2) {
+      T.tree[get<2>(edge)].parent = get<1>(edge);
+      T.tree[get<2>(edge)].weight = get<0>(edge);
+      T.tree[get<1>(edge)].children.insert(get<2>(edge));
+      for (pair<Vertex, Weight> neighbour : G.adjList[get<2>(edge)]) {
+        if (T.tree[neighbour.first].parent == -2) {
+          active_vertices.push_back(
+              {neighbour.second, get<2>(edge), neighbour.first});
+          push_heap(active_vertices.begin(), active_vertices.end(), cmp);
+        }
+      }
+    }
+  }
+  return T;
+}
