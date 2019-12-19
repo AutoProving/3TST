@@ -29,18 +29,28 @@ inline void steiner_3(const vector<map<Vertex, Weight>> &adjList,
       distIntersect = min_distance0[i] + min_distance1[i] + min_distance2[i];
     }
   }
-  // Merge origin1 into origin0
+  // Fill seen
+  vector<bool> seen(adjList.size(),false);
   Vertex current = intersect;
+  while (origin0[current] != -1) {
+    seen[current] = true;
+    current = origin0[current];
+  }
+  seen[current]=  true;
+  // Merge origin1 into origin0
+  current = intersect;
   while (origin1[current] != -1) {
-    if (origin1[current] != origin0[current]) {
+    if (!seen[origin1[current]]) {
       origin0[origin1[current]] = current;
     }
+    seen[current] = true;
     current = origin1[current];
   }
+  seen[current] = true;
   // Merge origin2 into origin0
   current = intersect;
   while (origin2[current] != -1) {
-    if (origin2[current] != origin0[current]) {
+    if (!seen[origin2[current]]) {
       origin0[origin2[current]] = current;
     }
     current = origin2[current];
@@ -63,15 +73,15 @@ Tree incrementalDijks3(const Graph &G, Vertex root,
   while (far_dist > 0 && !tle) {
     if (dijk_simple) {
       dijk_simple = false;
-      vector<Weight> backup_distance = min_distance;
-      vector<Vertex> backup_origin = origin;
+      vector<Weight> copy_distance = min_distance;
+      vector<Vertex> copy_origin = origin;
 
       // Update graph, set edge to 0
       last_far = far; // TODO: virer, inutile, il faut juste un valeur far pour
                       // chaque cas du if, pas besoin de copier
       Vertex current = far;
-      while (origin[current] != -1 && backup_distance[current] != 0) {
-        backup_distance[current] = 0;
+      while (origin[current] != -1 && copy_distance[current] != 0) {
+        copy_distance[current] = 0;
         current = origin[current];
       }
       current = far;
@@ -79,22 +89,22 @@ Tree incrementalDijks3(const Graph &G, Vertex root,
       while (origin[current] != -1 && min_distance[current] != 0) {
         for (map<Vertex, Weight>::const_iterator it = adjList[current].begin();
              it != adjList[current].end(); ++it) {
-          if (it->first != backup_origin[current] &&
-              backup_distance[it->first] > it->second) {
-            active_vertices.erase({backup_distance[it->first], it->first});
+          if (it->first != copy_origin[current] &&
+              copy_distance[it->first] > it->second) {
+            active_vertices.erase({copy_distance[it->first], it->first});
             active_vertices.insert({it->second, it->first});
-            backup_distance[it->first] = it->second;
-            backup_origin[it->first] = current;
+            copy_distance[it->first] = it->second;
+            copy_origin[it->first] = current;
           }
         }
         current = origin[current];
       }
-      dijkstra(adjList, backup_distance, backup_origin, active_vertices);
+      dijkstra(adjList, copy_distance, copy_origin, active_vertices);
       far_dist = 0;
       for (vector<Vertex>::const_iterator it = terminals.begin();
            it != terminals.end(); ++it) {
-        if (far_dist < backup_distance[*it]) {
-          far_dist = backup_distance[*it];
+        if (far_dist < copy_distance[*it]) {
+          far_dist = copy_distance[*it];
           far = *it;
         }
       }
