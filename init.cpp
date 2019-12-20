@@ -30,13 +30,13 @@ inline void steiner_3(const vector<map<Vertex, Weight>> &adjList,
     }
   }
   // Fill seen
-  vector<bool> seen(adjList.size(),false);
+  vector<bool> seen(adjList.size(), false);
   Vertex current = intersect;
   while (origin0[current] != -1) {
     seen[current] = true;
     current = origin0[current];
   }
-  seen[current]=  true;
+  seen[current] = true;
   // Merge origin1 into origin0
   current = intersect;
   while (origin1[current] != -1) {
@@ -334,7 +334,7 @@ Tree mst(const Graph &G, Vertex root) {
   return T;
 }
 
-Tree random(const Graph &G, Vertex root) {
+Tree strong_bias_random(const Graph &G, Vertex root) {
   Tree T(G, root);
   default_random_engine generator;
   vector<tuple<Weight, Vertex, Vertex>> active_vertices;
@@ -358,6 +358,35 @@ Tree random(const Graph &G, Vertex root) {
           push_heap(active_vertices.begin(), active_vertices.end(), cmp);
         }
       }
+    }
+  }
+  return T;
+}
+
+Tree random(const Graph &G, Vertex root) {
+  vector<Vertex> origin(G.adjList.size(), -2);
+  origin[root] = -1;
+  default_random_engine generator;
+  for (Vertex t : G.terminals) {
+    vector<bool> seen(G.adjList.size(), false);
+    Vertex current = t;
+    while (origin[current] == -2 || seen[current]) {
+      seen[current] = true;
+      int position = uniform_int_distribution<int>(
+          0, G.adjList[current].size() - 1)(generator);
+      map<Vertex, Weight>::const_iterator it = G.adjList[current].begin();
+      advance(it, position);
+      Vertex next = it->first;
+      origin[current] = next;
+      current = next;
+    }
+  }
+  Tree T(G, root);
+  for (unsigned int i = 0; i < G.adjList.size(); ++i) {
+    if (origin[i] > -1) {
+      T.tree[i].parent = origin[i];
+      T.tree[i].weight = G.adjList[i].find(origin[i])->second;
+      T.tree[origin[i]].children.insert(i);
     }
   }
   return T;
