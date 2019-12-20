@@ -109,9 +109,9 @@ map<pair<Vertex, Vertex>, vector<Vertex>> Graph::contract() {
   for (unsigned int v = 0; v < adjList.size(); ++v) {
     if (terminalsMap[v] == -1 && adjList[v].size() == 2) {
       Vertex v1 = adjList[v].begin()->first;
-      Weight w1 = adjList[v].begin()->second;
+      Weight w = adjList[v].begin()->second;
       Vertex v2 = adjList[v].rbegin()->first;
-      Weight w2 = adjList[v].rbegin()->second;
+      w += adjList[v].rbegin()->second;
 
       adjList[v].clear();
 
@@ -120,6 +120,8 @@ map<pair<Vertex, Vertex>, vector<Vertex>> Graph::contract() {
       tmp1.push_back(v);
       Vertex old_v1 = v;
       Vertex old_v2 = v;
+      adjList[v1].erase(old_v1);
+      adjList[v2].erase(old_v2);
       auto it = hash.find({old_v1, v1});
       if (it != hash.end()) {
         tmp1.insert(tmp1.end(), it->second.begin(), it->second.end());
@@ -133,19 +135,14 @@ map<pair<Vertex, Vertex>, vector<Vertex>> Graph::contract() {
         hash.erase(hash.find({v2, old_v2}));
       }
 
-      while ((terminalsMap[v1] == -1 && adjList[v1].size() == 2) ||
-             (terminalsMap[v2] == -1 && adjList[v2].size() == 2)) {
-        while (terminalsMap[v1] == -1 && adjList[v1].size() == 2) {
-          if (adjList[v1].begin()->first == old_v1) {
-            old_v1 = v1;
-            w1 += adjList[v1].rbegin()->second;
-            v1 = adjList[v1].rbegin()->first;
-          } else {
-            old_v1 = v1;
-            w1 += adjList[v1].begin()->second;
-            v1 = adjList[v1].begin()->first;
-          }
+      while ((terminalsMap[v1] == -1 && adjList[v1].size() == 1) ||
+             (terminalsMap[v2] == -1 && adjList[v2].size() == 1)) {
+        while (terminalsMap[v1] == -1 && adjList[v1].size() == 1) {
+          old_v1 = v1;
+          w += adjList[v1].begin()->second;
+          v1 = adjList[v1].begin()->first;
           adjList[old_v1].clear();
+          adjList[v1].erase(old_v1);
           tmp1.push_back(old_v1);
           it = hash.find({old_v1, v1});
           if (it != hash.end()) {
@@ -155,17 +152,12 @@ map<pair<Vertex, Vertex>, vector<Vertex>> Graph::contract() {
           }
         }
 
-        while (terminalsMap[v2] == -1 && adjList[v2].size() == 2) {
-          if (adjList[v2].begin()->first == old_v2) {
-            old_v2 = v2;
-            w2 += adjList[v2].rbegin()->second;
-            v2 = adjList[v2].rbegin()->first;
-          } else {
-            old_v2 = v2;
-            w2 += adjList[v2].begin()->second;
-            v2 = adjList[v2].begin()->first;
-          }
+        while (terminalsMap[v2] == -1 && adjList[v2].size() == 1) {
+          old_v2 = v2;
+          w += adjList[v2].begin()->second;
+          v2 = adjList[v2].begin()->first;
           adjList[old_v2].clear();
+          adjList[v2].erase(old_v2);
           tmp2.push_back(old_v2);
           it = hash.find({old_v2, v2});
           if (it != hash.end()) {
@@ -177,34 +169,36 @@ map<pair<Vertex, Vertex>, vector<Vertex>> Graph::contract() {
 
         map<Vertex, Weight>::iterator itn = adjList[v1].find(v2);
         if (itn != adjList[v1].end() && v1 != v2) {
-          if (itn->second > w1 + w2) {
+          if (itn->second > w) {
             adjList[v1].erase(itn);
-            auto it = adjList[v2].find(v1);
-            if (it != adjList[v2].end())
-              adjList[v2].erase(it);
+            adjList[v2].erase(adjList[v2].find(v1));
+            it = hash.find({v1, v2});
+            if (it != hash.end()) {
+              hash.erase(it);
+              hash.erase(hash.find({v2, v1}));
+            }
           }
         }
       }
-      adjList[v1].erase(old_v1);
-      adjList[v2].erase(old_v2);
 
       if (v1 != v2) {
         auto tmp = vector<Vertex>(tmp1.rbegin(), tmp1.rend());
         tmp.insert(tmp.end(), tmp2.begin(), tmp2.end());
         map<Vertex, Weight>::iterator itn = adjList[v1].find(v2);
         if (itn == adjList[v1].end()) {
-          adjList[v1].insert({v2, w1 + w2});
-          adjList[v2].insert({v1, w1 + w2});
+          adjList[v1].insert({v2, w});
+          adjList[v2].insert({v1, w});
           hash.insert({{v1, v2}, tmp});
           hash.insert({{v2, v1}, vector<Vertex>(tmp.rbegin(), tmp.rend())});
         } else {
-          if (itn->second > w1 + w2) {
+          if (itn->second > w) {
             adjList[v1].erase(itn);
-            adjList[v1].insert({v2, w1 + w2});
+            adjList[v1].insert({v2, w});
+            adjList[v1].insert({v2, w});
             hash.erase({v1, v2});
             hash.insert({{v1, v2}, tmp});
             adjList[v2].erase(v1);
-            adjList[v2].insert({v1, w1 + w2});
+            adjList[v2].insert({v1, w});
             hash.erase({v2, v1});
             hash.insert({{v2, v1}, vector<Vertex>(tmp.rbegin(), tmp.rend())});
           }
