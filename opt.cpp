@@ -297,14 +297,12 @@ void apply_opt(Tree &T, const Graph &G) {
         return;
       if (T.tree[*it].children.size() > 1) {
         opt_d3_son(*it, T, G.adjList, G.terminalsMap);
-        T.check(G);
       }
       if (tle)
         return;
       if (T.tree[*it].children.size() > 2 ||
           (T.tree[*it].children.size() == 2 && G.terminalsMap[*it] != -1)) {
         opt_d3_parent(*it, T, G.adjList, G.terminalsMap);
-        T.check(G);
       }
     }
   }
