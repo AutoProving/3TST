@@ -31,10 +31,12 @@ Graph::Graph(istream &input) {
     Weight w;
     getline(input, line);
     std::stringstream(line).ignore(256, ' ') >> v1 >> v2 >> w;
-    v1--;
-    v2--;
-    adjList[v1].insert(std::pair<Vertex, Weight>(v2, w));
-    adjList[v2].insert(std::pair<Vertex, Weight>(v1, w));
+    if (v1 != v2) {
+      v1--;
+      v2--;
+      adjList[v1].insert(std::pair<Vertex, Weight>(v2, w));
+      adjList[v2].insert(std::pair<Vertex, Weight>(v1, w));
+    }
   }
 
   // Get terminals section
