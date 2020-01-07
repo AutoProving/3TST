@@ -311,7 +311,8 @@ Tree mst(const Graph &G, Vertex root) {
   Tree T(G, root);
   vector<tuple<Weight, Vertex, Vertex>> active_vertices;
   for (pair<Vertex, Weight> neighbour : G.adjList[root]) {
-    active_vertices.push_back({neighbour.second, root, neighbour.first});
+    active_vertices.push_back(
+        tuple<Weight, Vertex, Vertex>(neighbour.second, root, neighbour.first));
   }
   make_heap(active_vertices.begin(), active_vertices.end(), cmp);
   while (!active_vertices.empty()) {
@@ -324,8 +325,8 @@ Tree mst(const Graph &G, Vertex root) {
       T.tree[get<1>(edge)].children.insert(get<2>(edge));
       for (pair<Vertex, Weight> neighbour : G.adjList[get<2>(edge)]) {
         if (T.tree[neighbour.first].parent == -2) {
-          active_vertices.push_back(
-              {neighbour.second, get<2>(edge), neighbour.first});
+          active_vertices.push_back(tuple<Weight, Vertex, Vertex>(
+              neighbour.second, get<2>(edge), neighbour.first));
           push_heap(active_vertices.begin(), active_vertices.end(), cmp);
         }
       }
@@ -339,7 +340,8 @@ Tree strong_bias_random(const Graph &G, Vertex root) {
   default_random_engine generator;
   vector<tuple<Weight, Vertex, Vertex>> active_vertices;
   for (pair<Vertex, Weight> neighbour : G.adjList[root]) {
-    active_vertices.push_back({neighbour.second, root, neighbour.first});
+    active_vertices.push_back(
+        tuple<Weight, Vertex, Vertex>(neighbour.second, root, neighbour.first));
   }
   while (!active_vertices.empty()) {
     int position =
@@ -353,8 +355,8 @@ Tree strong_bias_random(const Graph &G, Vertex root) {
       T.tree[get<1>(edge)].children.insert(get<2>(edge));
       for (pair<Vertex, Weight> neighbour : G.adjList[get<2>(edge)]) {
         if (T.tree[neighbour.first].parent == -2) {
-          active_vertices.push_back(
-              {neighbour.second, get<2>(edge), neighbour.first});
+          active_vertices.push_back(tuple<Weight, Vertex, Vertex>(
+              neighbour.second, get<2>(edge), neighbour.first));
           push_heap(active_vertices.begin(), active_vertices.end(), cmp);
         }
       }
