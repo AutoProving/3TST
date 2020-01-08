@@ -14,6 +14,25 @@ Graph merge_trees(const vector<Tree> &trees, const vector<int> &terminals,
   return G;
 }
 
+Weight complet_opt(Tree &T, const Graph &G, const vector<int> &terminalsMap) {
+  Weight oldw = MAX_WEIGHT, w = T.pruneLeaves(terminalsMap);
+  do {
+    if (tle)
+      break;
+    oldw = w;
+    apply_opt(T, G);
+    w = T.pruneLeaves(terminalsMap);
+  } while (oldw != w);
+  do {
+    if (tle)
+      break;
+    oldw = w;
+    full_d3(T, G);
+    w = T.pruneLeaves(terminalsMap);
+  } while (oldw != w);
+  return w;
+}
+
 pair<Tree, Weight> complet_heuristic(const Graph &G,
                                      const vector<int> &terminalsMap,
                                      const vector<Vertex> &terminals) {
@@ -32,27 +51,13 @@ pair<Tree, Weight> complet_heuristic(const Graph &G,
   }
   default: {
     Tree T(G, 0);
-    Weight w, oldw, wf = MAX_WEIGHT;
+    Weight w, wf = MAX_WEIGHT;
     for (vector<Vertex>::const_iterator it = terminals.begin();
          it != terminals.end(); ++it) {
       if (tle)
         break;
       Tree tmp = incrementalDijks3(G, *it, terminalsMap, terminals);
-      w = tmp.pruneLeaves(terminalsMap);
-      do {
-        if (tle)
-          break;
-        oldw = w;
-        apply_opt(tmp, G);
-        w = tmp.pruneLeaves(terminalsMap);
-      } while (oldw != w);
-      do {
-        if (tle)
-          break;
-        oldw = w;
-        full_d3(tmp, G);
-        w = tmp.pruneLeaves(terminalsMap);
-      } while (oldw != w);
+      w = complet_opt(tmp, G, terminalsMap);
       if (wf > w) {
         wf = w;
         T.root = tmp.root;
@@ -64,21 +69,7 @@ pair<Tree, Weight> complet_heuristic(const Graph &G,
       if (tle)
         break;
       Tree tmp = incrementalOptDijks3(G, *it, terminalsMap, terminals);
-      w = tmp.pruneLeaves(G.terminalsMap);
-      do {
-        if (tle)
-          break;
-        oldw = w;
-        apply_opt(tmp, G);
-        w = tmp.pruneLeaves(G.terminalsMap);
-      } while (oldw != w);
-      do {
-        if (tle)
-          break;
-        oldw = w;
-        full_d3(tmp, G);
-        w = tmp.pruneLeaves(G.terminalsMap);
-      } while (oldw != w);
+      w = complet_opt(tmp, G, terminalsMap);
       if (wf > w) {
         wf = w;
         T.root = tmp.root;
