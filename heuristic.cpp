@@ -64,11 +64,8 @@ pair<Tree, Weight> complet_heuristic(const Graph &G,
         T.tree.swap(tmp.tree);
       }
     }
-    for (vector<Vertex>::const_iterator it = terminals.begin();
-         it != terminals.end(); ++it) {
-      if (tle)
-        break;
-      Tree tmp = incrementalOptDijks3(G, *it, terminalsMap, terminals);
+    while (!tle) {
+      Tree tmp = random(G, terminals[0]);
       w = complet_opt(tmp, G, terminalsMap);
       if (wf > w) {
         wf = w;
