@@ -76,6 +76,15 @@ pair<Tree, Weight> complet_heuristic(const Graph &G,
         T.tree.swap(tmp.tree);
       }
     }
+    while (!tle) {
+      Tree tmp = random(G, terminals[0]);
+      w = complet_opt(tmp, G, terminalsMap);
+      if (wf > w) {
+        wf = w;
+        T.root = tmp.root;
+        T.tree.swap(tmp.tree);
+      }
+    }
     return {T, wf};
   }
   }
