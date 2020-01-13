@@ -50,6 +50,7 @@ pair<Tree, Weight> complet_heuristic(const Graph &G,
     return {T, T.pruneLeaves(terminalsMap)};
   }
   default: {
+    Tree spanning_tree = mst(G, terminals[0]);
     Tree T(G, 0);
     Weight w, wf = MAX_WEIGHT;
     for (vector<Vertex>::const_iterator it = terminals.begin();
@@ -62,6 +63,22 @@ pair<Tree, Weight> complet_heuristic(const Graph &G,
         wf = w;
         T.root = tmp.root;
         T.tree.swap(tmp.tree);
+      }
+      vector<Tree> trees(1, spanning_tree);
+      trees.reserve(6);
+      trees.push_back(T);
+      trees.push_back(tmp);
+      for (int i = 0; i < 3 && !tle; ++i)
+        trees.push_back(random(G, *it));
+      if (!tle) {
+        Graph newG = merge_trees(trees, terminals, terminalsMap);
+        Tree tmp = incrementalDijks3(G, *it, terminalsMap, terminals);
+        w = complet_opt(tmp, G, terminalsMap);
+        if (wf > w) {
+          wf = w;
+          T.root = tmp.root;
+          T.tree.swap(tmp.tree);
+        }
       }
     }
     for (vector<Vertex>::const_iterator it = terminals.begin();
