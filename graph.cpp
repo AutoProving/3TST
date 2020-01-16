@@ -3,7 +3,7 @@
 using namespace std;
 
 Weight MAX_WEIGHT =
-    INT_MAX; // Initialization of the global variable with maximum weight
+    LONG_MAX; // Initialization of the global variable with maximum weight
 
 Graph::Graph(istream &input) {
   std::string line;
