@@ -1,7 +1,7 @@
 CXX=g++
 RM=rm -f
 #CPPFLAGS=-std=c++11 -g -W -Wall -Winline -Wextra
-CPPFLAGS=-std=c++11 -O3 -march=native -flto
+CPPFLAGS=-std=c++11 -O3 -march=native -flto -fwhole-program
 
 SRCS=graph.cpp init.cpp main.cpp opt.cpp tree.cpp dijkstra.cpp heuristic.cpp
 OBJS=$(subst .cpp,.o,$(SRCS))
