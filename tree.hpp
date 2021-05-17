@@ -28,11 +28,11 @@ public:
   void print(); // Recursively prints the tree
   void print(const map<pair<Vertex, Vertex>, vector<Vertex>>
                  &hash); // Recursively prints the tree
-  void pruneRoot(const vector<int> &terminalsMap); // prune the root if it's not
+  void pruneRoot(const vector<int> &terminalsMap); // Prune the root if it's not
                                                    // a terminal node
   bool check(const Graph &G);
   Weight pruneLeaves(
       const vector<int>
-          &terminalsMap); // prune useless leaves en return the size of the tree
+          &terminalsMap); // Prune useless leaves and return the size of the tree
   int size();
 };

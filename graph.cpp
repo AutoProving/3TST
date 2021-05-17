@@ -9,10 +9,10 @@ Graph::Graph(istream &input) {
   std::string line;
   int numberEdges, numberTerminals, numberVertices;
 
-  // Find graph section
+  // Find the graph section in the input
   find_next(input, "SECTION Graph", line);
 
-  // Get number of vertices
+  // Get the number of vertices
   getline(input, line);
   std::stringstream(line).ignore(256, ' ') >> (numberVertices);
   adjList.reserve(numberVertices);
@@ -21,7 +21,7 @@ Graph::Graph(istream &input) {
     adjList.push_back(tmpmap);
   }
 
-  // Get number of edges
+  // Get the number of edges
   getline(input, line);
   std::stringstream(line).ignore(256, ' ') >> (numberEdges);
 
@@ -39,21 +39,21 @@ Graph::Graph(istream &input) {
     }
   }
 
-  // Get terminals section
+  // Get the terminals section in the input
   find_next(input, "SECTION Terminals", line);
 
   // Get the number of terminals
   getline(input, line);
   std::stringstream(line).ignore(256, ' ') >> (numberTerminals);
 
-  // initialize Terminals
+  // Initialize Terminals
   terminals.resize(numberTerminals, 0);
-  // all entries in terminalsMap are initialized to -1
+  // All entries in terminalsMap are initialized to -1
   terminalsMap.resize(numberVertices, -1);
   for (int i = 0; i < numberTerminals; ++i) {
     getline(input, line);
     std::stringstream(line).ignore(256, ' ') >> terminals[i];
-    terminals[i]--; // subtracts 1 because vertices are numbered from 0
+    terminals[i]--; // Subtracts 1 because vertices are numbered from 0
     terminalsMap[terminals[i]] = i;
   }
 }
@@ -76,12 +76,12 @@ void Graph::print() {
   cout << "Number of Terminals: " << terminals.size() << endl;
   cout << endl;
   cout << "Terminals: " << endl;
-  // print Terminals
+  // Print Terminals
   for (unsigned int i = 0; i < terminals.size(); i++) {
-    cout << terminals[i] + 1 << " "; // adds +1 back to the vertex number
+    cout << terminals[i] + 1 << " "; // Adds +1 back to the vertex number
   }
   cout << endl << endl;
-  // print Edges
+  // Print Edges
   for (unsigned int v1 = 0; v1 < adjList.size(); v1++) {
     for (std::map<Vertex, Weight>::iterator it = adjList[v1].begin();
          it != adjList[v1].end(); ++it) {
@@ -94,7 +94,7 @@ void Graph::print() {
 
 map<pair<Vertex, Vertex>, vector<Vertex>> Graph::contract() {
   map<pair<Vertex, Vertex>, vector<Vertex>> hash;
-  // Contract vertex of degree 1
+  // Contract vertices of degree 1
   for (unsigned int v = 0; v < adjList.size(); ++v) {
     if (terminalsMap[v] == -1 && adjList[v].size() == 1) {
       Vertex current = v;
@@ -107,7 +107,7 @@ map<pair<Vertex, Vertex>, vector<Vertex>> Graph::contract() {
     }
   }
 
-  // Contract vertex of degree 2
+  // Contract vertices of degree 2
   for (unsigned int v = 0; v < adjList.size(); ++v) {
     if (terminalsMap[v] == -1 && adjList[v].size() == 2) {
       Vertex v1 = adjList[v].begin()->first;

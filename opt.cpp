@@ -287,7 +287,7 @@ void apply_opt(Tree &T, const Graph &G) {
     }
   }
 
-  // apply optimisation following the next_opt order
+  // Apply optimisation following the next_opt order
   for (vector<Vertex>::reverse_iterator it = next_opt.rbegin();
        it != next_opt.rend(); ++it) {
     if (T.tree[*it].parent > -2) {

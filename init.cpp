@@ -57,7 +57,6 @@ inline void steiner_3(const vector<map<Vertex, Weight>> &adjList,
   }
 }
 
-// TODO This can be simply by the algo from the paper. Try to rewrite it
 Tree incrementalDijks3(const Graph &G, Vertex root,
                        const vector<int> &terminalsMap,
                        const vector<Vertex> &terminals) {
@@ -77,8 +76,7 @@ Tree incrementalDijks3(const Graph &G, Vertex root,
       vector<Vertex> copy_origin = origin;
 
       // Update graph, set edge to 0
-      last_far = far; // TODO: virer, inutile, il faut juste un valeur far pour
-                      // chaque cas du if, pas besoin de copier
+      last_far = far;
       Vertex current = far;
       while (origin[current] != -1 && copy_distance[current] != 0) {
         copy_distance[current] = 0;
@@ -139,7 +137,7 @@ Tree incrementalDijks3(const Graph &G, Vertex root,
     }
   }
 
-  // build tree
+  // Build tree
   Tree T(G, root);
   for (unsigned int i = 0; i < G.adjList.size(); ++i) {
     if (origin[i] != -1) {
@@ -291,7 +289,7 @@ Tree incrementalOptDijks3(const Graph &G, Vertex root,
     }
   }
 
-  // build tree
+  // Build tree
   Tree T(G, root);
   for (unsigned int i = 0; i < G.adjList.size(); ++i) {
     if (origin[i] != -1) {
