@@ -1,4 +1,4 @@
-# 3TST - A Steiner Tree Heuristics
+# 3TST - A Steiner Tree Heuristic
 
 3-Terminal Steiner Tree (3TST) is a heuristic for the Steiner tree problem. Intuitively, the heuristic works
 by replacing 3-terminal subtrees of a prospective solution by lighter 3-terminal subtrees. This process
