@@ -17,11 +17,15 @@ An executable called 3TST.exe will be created.
 
 The simplest way of executing the program is to run the following command. It will read the input file from the standard input. 
 
+```
 ./3TST.exe < inputFile.gr   
+```
 
 As a second option you can use the flag "-s" to specify the seed that will initialize the random number generator. In the example below, the seed is 10. 
 
+```
 ./3TST.exe -s 10 < inputFile.gr
+```
 
 ## Input/Output Formats
 
