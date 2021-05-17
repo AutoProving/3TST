@@ -7,8 +7,9 @@
 Open a windows/linux terminal and execute the following command 
 to clone this repository. 
 
-(TO DO)
-
+```
+TO DO
+```
 Enter the main folder "3TST" and type "make" to compile the program. 
 
 An executable called 3TST.exe will be created. 
@@ -28,6 +29,14 @@ initialize the random number generator. In the example below, the seed is 10.
 ```
 ./3TST.exe -s 10 < inputFile.gr
 ```
+
+In the third option we can execute the program on a graph instance together with an initial 
+Steiner tree. In this case, the program will try to find a Steiner tree of lower weight. 
+
+```
+TO DO
+```
+
 
 ## Input/Output Formats
 
