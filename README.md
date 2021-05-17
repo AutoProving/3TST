@@ -25,7 +25,9 @@ As a second option you can use the flag "-s" to specify the seed that will initi
 
 ## Input/Output Formats
 
-The input format for graphs and the output format for Steiner trees are the same used at PACE Challenge 2018. Please refer to the file InputOutputFormat.txt for a description of these formats. Alternatively, please read Sections A and B of the following link: https://pacechallenge.org/2018/steiner-tree/  
+The input format for graphs and the output format for Steiner trees are the same used at PACE Challenge 2018. Please refer to the file inputOutputFormats.txt for a description of these formats. Alternatively, please read Sections A and B of the following link:
+
+https://pacechallenge.org/2018/steiner-tree/  
 
 
 ## Citation: 
