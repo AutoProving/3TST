@@ -5,4 +5,5 @@
 
 pair<Tree, Weight> complet_heuristic(const Graph &G,
                                      const vector<int> &terminalsMap,
-                                     const vector<Vertex> &terminals);
+                                     const vector<Vertex> &terminals,
+                                     bool random_init);

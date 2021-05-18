@@ -9,34 +9,59 @@ is repeated until no significant improvement is observed in a reasonable amount 
 Open a windows/linux terminal and execute the following command 
 to clone this repository. 
 
+```sh
+git clone https://github.com/AutoProving/3TST.git
 ```
-TO DO
-```
-Enter the main folder "3TST" and type "make" to compile the program. 
+Enter the main folder `3TST` and type `make` to compile the program. 
 
-An executable called 3TST.exe will be created. 
+An executable called `3TST.exe` will be created. 
 
 ## Usage
 
-The simplest way of executing the program is to run the following command. 
-It will read the input file from the standard input. 
+The simplest way of executing the program is to run the following command.
+It will read the input graph from the standard input and print a Steiner tree
+on the standard output. This is a deterministic procedure. It can be stopped
+manually using a `SIGINT` or a `SIGTERM`.
 
-```
-./3TST.exe < inputFile.gr   
-```
-
-As a second option you can use the flag "-s" to specify the seed that will
-initialize the random number generator. In the example below, the seed is 10. 
-
-```
-./3TST.exe -s 10 < inputFile.gr
+```sh
+./3TST.exe < inputFile.gr
 ```
 
-In the third option we can execute the program on a graph instance together with an initial 
-Steiner tree. In this case, the program will try to find a Steiner tree of lower weight. 
+The `timeout` command can be used to run it with a time limit.
 
+```sh
+timeout -s TERM 10s ./3TST < inputFile.gr
 ```
-TO DO
+
+The option `-h` or `--help` prints the help message
+
+```sh
+./3TST --help
+```
+
+The option `-r` or `--random` enables the use of randomised procedure. This option makes
+the program run until it receives a SIGTERM or SIGINT. In this case the `timeout` command
+is useful.
+
+```sh
+timeout -s TERM 90s ./3TST --random < inputFile.gr
+```
+
+It is possible to give a specific seed to initialise the random number generator using
+the flag `-s` or `--seed`. This flag have effect only with the `--random` option.
+In the example below, the seed is 10.
+
+```sh
+./3TST.exe -r -s 10 < inputFile.gr
+```
+
+With the option `-i` or `--improve` we can execute the program on a graph instance
+together with an initial Steiner tree. In this case, the program will try to improve
+he Steiner tree of lower weight. This is a deterministic procedure. `--random` and
+`--seed` have no effect with `--improve`.
+
+```sh
+cat inputFile.gr steinertree.ost | ./3TST.exe -i
 ```
 
 
@@ -47,8 +72,11 @@ same used at PACE Challenge 2018. Please refer to the file [INPUT_OUTPUT.md](INP
 for a description of these formats. Alternatively, please read Sections
 A and B of the following link:
 
-https://pacechallenge.org/2018/steiner-tree/  
+[https://pacechallenge.org/2018/steiner-tree/](https://pacechallenge.org/2018/steiner-tree/)
 
+## Bug Reports and User Feedback
+
+Please report bugs or ask questions using the issue tracker a [https://github.com/AutoProving/3TST/issues](https://github.com/AutoProving/3TST/issues)
 
 ## Citation: 
 

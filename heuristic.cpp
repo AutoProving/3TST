@@ -15,7 +15,7 @@ Graph merge_trees(const vector<Tree> &trees, const vector<int> &terminals,
 }
 
 Weight complet_opt(Tree &T, const Graph &G, const vector<int> &terminalsMap) {
-  Weight oldw = MAX_WEIGHT, w = T.pruneLeaves(terminalsMap);
+  Weight oldw, w = T.pruneLeaves(terminalsMap);
   do {
     if (tle)
       break;
@@ -35,7 +35,7 @@ Weight complet_opt(Tree &T, const Graph &G, const vector<int> &terminalsMap) {
 
 pair<Tree, Weight> complet_heuristic(const Graph &G,
                                      const vector<int> &terminalsMap,
-                                     const vector<Vertex> &terminals) {
+                                     const vector<Vertex> &terminals, bool random_init) {
   switch (terminals.size()) {
   case 0:
     return {Tree(G, 0), 0};
@@ -64,7 +64,7 @@ pair<Tree, Weight> complet_heuristic(const Graph &G,
         T.tree.swap(tmp.tree);
       }
     }
-    while (!tle) {
+    while (!tle && random_init) {
       for (vector<Vertex>::const_iterator it = terminals.begin();
            it != terminals.end(); ++it) {
         if (tle)
