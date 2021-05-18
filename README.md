@@ -24,13 +24,13 @@ on the standard output. This is a deterministic procedure. It can be stopped
 manually using a `SIGINT` or a `SIGTERM`.
 
 ```sh
-./3TST.exe < inputFile.gr
+./3TST.exe < examples/instance1.gr
 ```
 
 The `timeout` command can be used to run it with a time limit.
 
 ```sh
-timeout -s TERM 10s ./3TST < inputFile.gr
+timeout -s TERM 10s ./3TST < examples/instance1.gr
 ```
 
 The option `-h` or `--help` prints the help message
@@ -39,12 +39,12 @@ The option `-h` or `--help` prints the help message
 ./3TST --help
 ```
 
-The option `-r` or `--random` enables the use of randomised procedure. This option makes
-the program run until it receives a SIGTERM or SIGINT. In this case the `timeout` command
-is useful.
+The option `-r` or `--random` enables the use of a randomised procedure. This option makes
+the program run until it receives a SIGTERM or SIGINT otherwise it will never stop.
+In this case the `timeout` command is useful.
 
 ```sh
-timeout -s TERM 90s ./3TST --random < inputFile.gr
+timeout -s TERM 90s ./3TST --random < examples/instance1.gr
 ```
 
 It is possible to give a specific seed to initialise the random number generator using
@@ -52,16 +52,16 @@ the flag `-s` or `--seed`. This flag have effect only with the `--random` option
 In the example below, the seed is 10.
 
 ```sh
-./3TST.exe -r -s 10 < inputFile.gr
+./3TST.exe -r -s 10 < examples/instance1.gr
 ```
 
 With the option `-i` or `--improve` we can execute the program on a graph instance
 together with an initial Steiner tree. In this case, the program will try to improve
-he Steiner tree of lower weight. This is a deterministic procedure. `--random` and
+the Steiner tree. This is a deterministic procedure. `--random` and
 `--seed` have no effect with `--improve`.
 
 ```sh
-cat inputFile.gr steinertree.ost | ./3TST.exe -i
+cat examples/instance1.gr examples/steinertree1.ost | ./3TST.exe -i
 ```
 
 
@@ -73,6 +73,8 @@ for a description of these formats. Alternatively, please read Sections
 A and B of the following link:
 
 [https://pacechallenge.org/2018/steiner-tree/](https://pacechallenge.org/2018/steiner-tree/)
+
+The `examples` folder contains some examples from the PACE Challenge.
 
 ## Bug Reports and User Feedback
 
