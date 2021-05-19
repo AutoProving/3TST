@@ -4,7 +4,7 @@
 by replacing 3-terminal subtrees of a prospective solution by lighter 3-terminal subtrees. This process
 is repeated until no significant improvement is observed in a reasonable amount of time. 
 
-## Compiling: 
+## Compilation
 
 Open a windows/linux terminal and execute the following command 
 to clone this repository. 
@@ -80,14 +80,14 @@ The `examples` folder contains some examples from the PACE Challenge.
 
 Please report bugs or ask questions using the issue tracker a [https://github.com/AutoProving/3TST/issues](https://github.com/AutoProving/3TST/issues)
 
-## Citation: 
+## Citation
 
 To cite our heuristics, please refer to the following paper.
 
 Emmanuel Arrighi, Mateus de Oliveira Oliveira. Three is Enough for Steiner Trees. 
 19th Symposium on Experimental Algorithms.
 
-## Acknowledgements: 
+## Acknowledgements 
 
 Emmanuel Arrighi acknowledges support from the Research Council of Norway in the
 context of the project Parameterized Complexity for Practical Computing (Grant no. 274526)
