@@ -30,13 +30,13 @@ manually using a `SIGINT` or a `SIGTERM`.
 The `timeout` command can be used to run it with a time limit.
 
 ```sh
-timeout -s TERM 10s ./3TST < examples/instance1.gr
+timeout -s TERM 10s ./3TST.exe < examples/instance1.gr
 ```
 
 The option `-h` or `--help` prints the help message
 
 ```sh
-./3TST --help
+./3TST.exe --help
 ```
 
 The option `-r` or `--random` enables the use of a randomised procedure. This option makes
@@ -44,7 +44,7 @@ the program run until it receives a SIGTERM or SIGINT otherwise it will never st
 In this case the `timeout` command is useful.
 
 ```sh
-timeout -s TERM 90s ./3TST --random < examples/instance1.gr
+timeout -s TERM 90s ./3TST.exe --random < examples/instance1.gr
 ```
 
 It is possible to give a specific seed to initialise the random number generator using
