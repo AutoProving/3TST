@@ -11,20 +11,24 @@ void usage(char *name) {
   cout << "Usage: " << name << " [OPTIONS] " << endl << endl;
 
   cout << name
-       << " is a heuristic for the Steiner tree problem. It reads the input on\
+       << " is a heuristic for the Steiner tree problem. It reads the input from\
  stdin. By default, "
        << name << " takes a graph as input and run a deterministic\
- heuristic on it and output a Steiner tree."
+ heuristic on it and outputs a Steiner tree."
        << endl;
-  cout << name << " can be stop by sending an SIGINT or SIGTERM" << endl
+  cout << name << " can be stopped by a SIGINT or SIGTERM signal." << endl
        << endl;
   cout << "OPTIONS:\n\
     -r, --random\n\
-        After running the deterministic heuristic, it will run some randomised procedure. This does not terminate by itself and need to be explicitly stopped by sending to it a SIGINT or SIGTERM.\n\
+        After running a deterministic heuristic to construct a reasonable initial Steiner tree,\n\
+       	a randomized improvement procedure will be initiated. This procedure does not terminate by \n\
+	itself and needs to be explicitly stopped by a SIGINT or SIGTERM signal.\n\
     -i, --improve\n\
-        In addition to the graph, takes a Steiner tree as input and tries to improve it. This is a deterministic procedure. With this option --random and --seed have no effect.\n\
+        With this option, the program will take a graph and a Steiner tree as input and will \n\
+	try to construct a lighter Steiner tree. This is a deterministic procedure. With this option,\n\
+        the flags --random and --seed have no effect.\n\
     -s SEED, --seed SEED\n\
-        Initialize the random number generator with SEED. SEED must be an integer.\n\
+        Initializes the random number generator with SEED. SEED must be an integer.\n\
         Useful with the --random option.\
 " << endl;
 }
