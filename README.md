@@ -30,7 +30,7 @@ manually using a `SIGINT` or a `SIGTERM`.
 The `timeout` command can be used to run it with a time limit.
 
 ```sh
-timeout -s TERM 10s ./3TST < examples/instance1.gr
+timeout -s TERM 10s ./3TST.exe < examples/instance1.gr
 ```
 
 The option `-h` or `--help` prints the help message
