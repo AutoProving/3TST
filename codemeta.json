@@ -1,0 +1,15 @@
+{
+    "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+    "@type": "SoftwareSourceCode",
+    "license": "https://spdx.org/licenses/MIT",
+    "codeRepository": "https://github.com/AutoProving/3TST",
+    "datePublished": "2021-05-19",
+    "dateModified": "2021-05-19",
+    "issueTracker": "https://github.com/AutoProving/3TST/issues",
+    "name": "3TST - A Steiner Tree Heuristic",
+    "version": "1.0.0",
+    "description": "3-Terminal Steiner Tree (3TST) is a heuristic for the Steiner tree problem. Intuitively, the heuristic works by replacing 3-terminal subtrees of a prospective solution with lighter 3-terminal subtrees. This process is repeated until no significant improvement is observed in a reasonable amount of time.",
+    "programmingLanguage": [
+        "C++"
+    ]
+}
