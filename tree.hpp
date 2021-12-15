@@ -34,5 +34,6 @@ public:
   Weight pruneLeaves(
       const vector<int>
           &terminalsMap); // Prune useless leaves and return the size of the tree
+  Weight contract(const Graph &G); // Contract edge of degree 2
   int size();
 };

@@ -87,6 +87,8 @@ int main(int argc, char **argv) {
     Weight w, oldw;
     Tree T(G, cin);
     w = T.pruneLeaves(G.terminalsMap);
+    map<pair<Vertex, Vertex>, vector<Vertex>> hash = G.contract();
+    T.contract(G);
     do {
       if (tle)
         break;

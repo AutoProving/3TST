@@ -15,14 +15,14 @@ bool Tree::check(const Graph &G) {
         throw 20;
       }
       auto it = G.adjList[tree[i].parent].find(i);
-      if (it ==  G.adjList[tree[i].parent].end()){
-          cout << "graph" << endl;
+      if (it == G.adjList[tree[i].parent].end()) {
+        cout << "graph" << endl;
+        throw 10;
+      } else {
+        if (tree[i].weight != it->second) {
+          cout << "weight " << tree[i].weight << " " << it->second << endl;
           throw 10;
-      }else{
-          if (tree[i].weight != it->second){
-              cout << "weight " << tree[i].weight << " " << it->second << endl;
-              throw 10;
-          }
+        }
       }
     } else {
       if (tree[i].parent == -1) {
@@ -185,4 +185,36 @@ Tree::Tree(const Graph &G, istream &input) {
       }
     }
   }
+}
+
+Weight Tree::contract(const Graph &G) {
+  Weight w = 0;
+  stack<Vertex> next;
+  next.push(root);
+  while (!next.empty()) {
+    Vertex current = next.top();
+    next.pop();
+    if (G.adjList[current].size() == 0) {
+      assert(tree[current].children.size() == 1);
+      Vertex child = *tree[current].children.begin();
+
+      next.push(child);
+      tree[child].weight += tree[current].weight;
+      tree[child].parent = tree[current].parent;
+      tree[tree[current].parent].children.insert(child);
+
+      tree[tree[current].parent].remove(current);
+      tree[current].parent = -2;
+      tree[current].weight = 0;
+      tree[current].children.clear();
+    } else {
+      w += tree[current].weight;
+      for (set<Vertex>::iterator it = tree[current].children.begin();
+           it != tree[current].children.end(); ++it) {
+        next.push(*it);
+      }
+    }
+  }
+
+  return w;
 }
