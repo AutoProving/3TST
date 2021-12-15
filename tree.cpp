@@ -195,7 +195,6 @@ Weight Tree::contract(const Graph &G) {
     Vertex current = next.top();
     next.pop();
     if (G.adjList[current].size() == 0) {
-      assert(tree[current].children.size() == 1);
       Vertex child = *tree[current].children.begin();
 
       next.push(child);
