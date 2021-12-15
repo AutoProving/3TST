@@ -12,27 +12,29 @@ using namespace std::chrono;
 void usage(char *name) {
   cout << "Usage: " << name << " [OPTIONS] " << endl << endl;
 
-  cout << name
-       << " is a heuristic for the Steiner tree problem. It reads the input from\
- stdin. By default, "
-       << name << " takes a graph as input and run a deterministic\
- heuristic on it and outputs a Steiner tree."
-       << endl;
+  cout
+      << name
+      << " is a heuristic for the Steiner tree problem. It reads the input from\
+        stdin. By default, "
+      << name << " takes a graph as input and run a deterministic\
+        heuristic on it and outputs a Steiner tree."
+      << endl;
   cout << name << " can be stopped by a SIGINT or SIGTERM signal." << endl
        << endl;
   cout << "OPTIONS:\n\
-    -r, --random\n\
+        -r, --random\n\
         After running a deterministic heuristic to construct a reasonable initial Steiner tree,\n\
-       	a randomized improvement procedure will be initiated. This procedure does not terminate by \n\
-	itself and needs to be explicitly stopped by a SIGINT or SIGTERM signal.\n\
-    -i, --improve\n\
+        a randomized improvement procedure will be initiated. This procedure does not terminate by \n\
+        itself and needs to be explicitly stopped by a SIGINT or SIGTERM signal.\n\
+        -i, --improve\n\
         With this option, the program will take a graph and a Steiner tree as input and will \n\
-	try to construct a lighter Steiner tree. This is a deterministic procedure. With this option,\n\
+        try to construct a lighter Steiner tree. This is a deterministic procedure. With this option,\n\
         the flags --random and --seed have no effect.\n\
-    -s SEED, --seed SEED\n\
+        -s SEED, --seed SEED\n\
         Initializes the random number generator with SEED. SEED must be an integer.\n\
         Useful with the --random option.\
-" << endl;
+        "
+       << endl;
 }
 
 int main(int argc, char **argv) {
@@ -41,7 +43,7 @@ int main(int argc, char **argv) {
   signal(SIGTERM, signalHandler);
 
   bool improve = false;
-  bool random_init = false;
+  bool random_init = true;
 
   for (auto count = 1; count < argc; ++count) {
     string arg(argv[count]);
@@ -104,7 +106,7 @@ int main(int argc, char **argv) {
       w = T.pruneLeaves(G.terminalsMap);
     } while (oldw != w);
     cout << "VALUE " << w << endl;
-    T.print();
+    T.print(hash);
   }
 
   auto stop = high_resolution_clock::now();
