@@ -1,3 +1,4 @@
+#include <chrono>
 #include <csignal>
 #include <iostream>
 
@@ -6,6 +7,7 @@
 #include "tree.hpp"
 
 using namespace std;
+using namespace std::chrono;
 
 void usage(char *name) {
   cout << "Usage: " << name << " [OPTIONS] " << endl << endl;
@@ -50,7 +52,8 @@ int main(int argc, char **argv) {
     if (arg == "-s" || arg == "--seed") {
       try {
         ++count;
-        if (count >= argc) throw invalid_argument("Missing seed");
+        if (count >= argc)
+          throw invalid_argument("Missing seed");
         srand(stoi(argv[count]));
       } catch (const invalid_argument &e) {
         cerr << "Invalid argument: seed must be an integer." << endl;
@@ -72,16 +75,17 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  auto start = high_resolution_clock::now();
   Graph G(cin);
   if (not improve) {
     map<pair<Vertex, Vertex>, vector<Vertex>> hash = G.contract();
     pair<Tree, Weight> p =
-        complet_heuristic(G, G.terminalsMap, G.terminals, random_init);
+        complet_heuristic(G, G.terminalsMap, G.terminals, random_init, start);
     cout << "VALUE " << p.second << endl;
     p.first.print(hash);
   } else {
-    Tree T(G, cin);
     Weight w, oldw;
+    Tree T(G, cin);
     w = T.pruneLeaves(G.terminalsMap);
     do {
       if (tle)
@@ -101,5 +105,8 @@ int main(int argc, char **argv) {
     T.print();
   }
 
+  auto stop = high_resolution_clock::now();
+  auto duration = duration_cast<microseconds>(stop - start);
+  cerr << "Full run: " << duration.count() << endl;
   return 0;
 }

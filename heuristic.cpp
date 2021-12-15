@@ -1,5 +1,7 @@
 #include "heuristic.hpp"
 
+using namespace std::chrono;
+
 Graph merge_trees(const vector<Tree> &trees, const vector<int> &terminals,
                   const vector<int> &terminalsMap) {
   Graph G(terminals, terminalsMap);
@@ -35,7 +37,9 @@ Weight complet_opt(Tree &T, const Graph &G, const vector<int> &terminalsMap) {
 
 pair<Tree, Weight> complet_heuristic(const Graph &G,
                                      const vector<int> &terminalsMap,
-                                     const vector<Vertex> &terminals, bool random_init) {
+                                     const vector<Vertex> &terminals,
+                                     bool random_init,
+                                     const time_point<high_resolution_clock> &general_start) {
   switch (terminals.size()) {
   case 0:
     return {Tree(G, 0), 0};
@@ -56,12 +60,24 @@ pair<Tree, Weight> complet_heuristic(const Graph &G,
          it != terminals.end(); ++it) {
       if (tle)
         break;
+      auto start = high_resolution_clock::now();
       Tree tmp = incrementalDijks3(G, *it, terminalsMap, terminals);
+      auto stop = high_resolution_clock::now();
+      auto duration = duration_cast<microseconds>(stop - start);
+      cerr << "IncremetnalDijks3: " << duration.count() << " "
+           << tmp.pruneLeaves(terminalsMap) << endl;
+      start = high_resolution_clock::now();
       w = complet_opt(tmp, G, terminalsMap);
+      stop = high_resolution_clock::now();
+      duration = duration_cast<microseconds>(stop - start);
+      cerr << "complet_opt: " << duration.count() << " " << w << endl;
       if (wf > w) {
+        // TODO log best solution with time
         wf = w;
         T.root = tmp.root;
         T.tree.swap(tmp.tree);
+        duration = duration_cast<microseconds>(stop - general_start);
+        cerr << "new_opt: " << duration.count() << " " << wf << endl;
       }
     }
     while (!tle && random_init) {
@@ -69,12 +85,23 @@ pair<Tree, Weight> complet_heuristic(const Graph &G,
            it != terminals.end(); ++it) {
         if (tle)
           break;
+        auto start = high_resolution_clock::now();
         Tree tmp = random(G, *it);
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(stop - start);
+        cerr << "random: " << duration.count() << " "
+            << tmp.pruneLeaves(terminalsMap) << endl;
+        start = high_resolution_clock::now();
         w = complet_opt(tmp, G, terminalsMap);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        cerr << "complet_opt_random: " << duration.count() << " " << w << endl;
         if (wf > w) {
           wf = w;
           T.root = tmp.root;
           T.tree.swap(tmp.tree);
+          duration = duration_cast<microseconds>(stop - general_start);
+          cerr << "new_opt: " << duration.count() << " " << wf << endl;
         }
       }
     }
